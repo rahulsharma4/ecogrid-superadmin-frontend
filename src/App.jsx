@@ -20,6 +20,16 @@ import ConsultantDetailPage from './pages/ConsultantDetailPage';
 import ContactsPage from './pages/ContactsPage';
 import ContactDetailPage from './pages/ContactDetailPage';
 
+// Super Admin Pages
+import SuperAdminAdminsPage from './pages/superadmin/SuperAdminAdminsPage';
+import SuperAdminStaffPage from './pages/superadmin/SuperAdminStaffPage';
+import SuperAdminLeadsPage from './pages/superadmin/SuperAdminLeadsPage';
+import SuperAdminContactsPage from './pages/superadmin/SuperAdminContactsPage';
+import SuperAdminPaymentsPage from './pages/superadmin/SuperAdminPaymentsPage';
+import SuperAdminInvoicesPage from './pages/superadmin/SuperAdminInvoicesPage';
+import SuperAdminLogsPage from './pages/superadmin/SuperAdminLogsPage';
+import SuperAdminSettingsPage from './pages/superadmin/SuperAdminSettingsPage';
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -37,6 +47,12 @@ const ProtectedRoute = ({ children }) => {
 const AdminRoute = ({ children }) => {
   const { user } = useAuth();
   if (user?.role !== 'admin') return <Navigate to="/dashboard/stats" />;
+  return children;
+};
+
+const SuperAdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (user?.role !== 'superadmin') return <Navigate to="/dashboard/stats" />;
   return children;
 };
 
@@ -83,6 +99,17 @@ function App() {
                     <Route path="contacts/:id" element={<ContactDetailPage />} />
                     <Route path="payments" element={<PaymentsPage />} />
                     <Route path="payments/receipt/:id" element={<PaymentReceiptPage />} />
+                    
+                    {/* Super Admin Scoped Routes */}
+                    <Route path="superadmin/admins" element={<SuperAdminRoute><SuperAdminAdminsPage /></SuperAdminRoute>} />
+                    <Route path="superadmin/staff" element={<SuperAdminRoute><SuperAdminStaffPage /></SuperAdminRoute>} />
+                    <Route path="superadmin/leads" element={<SuperAdminRoute><SuperAdminLeadsPage /></SuperAdminRoute>} />
+                    <Route path="superadmin/contacts" element={<SuperAdminRoute><SuperAdminContactsPage /></SuperAdminRoute>} />
+                    <Route path="superadmin/payments" element={<SuperAdminRoute><SuperAdminPaymentsPage /></SuperAdminRoute>} />
+                    <Route path="superadmin/invoices" element={<SuperAdminRoute><SuperAdminInvoicesPage /></SuperAdminRoute>} />
+                    <Route path="superadmin/logs" element={<SuperAdminRoute><SuperAdminLogsPage /></SuperAdminRoute>} />
+                    <Route path="superadmin/settings" element={<SuperAdminRoute><SuperAdminSettingsPage /></SuperAdminRoute>} />
+                    
                     <Route path="*" element={<Navigate to="stats" />} />
                   </Routes>
                 </DashboardLayout>

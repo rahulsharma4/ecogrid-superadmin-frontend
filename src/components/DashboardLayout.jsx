@@ -18,7 +18,9 @@ import {
   Plus,
   Settings,
   Circle,
-  BookOpen
+  BookOpen,
+  Shield,
+  Terminal
 } from 'lucide-react';
 
 const DashboardLayout = ({ children }) => {
@@ -58,13 +60,21 @@ const DashboardLayout = ({ children }) => {
   };
 
   const navItems = [
-    { name: 'Home', path: '/dashboard/stats', icon: LayoutDashboard, roles: ['admin', 'staff', 'telecaller'] },
+    { name: 'Home', path: '/dashboard/stats', icon: LayoutDashboard, roles: ['superadmin', 'admin', 'staff', 'telecaller'] },
+    { name: 'Admins', path: '/dashboard/superadmin/admins', icon: Shield, roles: ['superadmin'] },
+    { name: 'Staff', path: '/dashboard/superadmin/staff', icon: Users, roles: ['superadmin'] },
     { name: 'Staff', path: '/dashboard/staff', icon: Users, roles: ['admin'] },
     { name: user?.role === 'telecaller' ? 'My Contacts' : 'Contacts', path: '/dashboard/contacts', icon: BookOpen, roles: ['admin', 'telecaller'] },
+    { name: 'Contacts', path: '/dashboard/superadmin/contacts', icon: BookOpen, roles: ['superadmin'] },
     { name: 'Leads', path: '/dashboard/leads', icon: UserSquare2, roles: ['admin', 'staff'] },
+    { name: 'Leads', path: '/dashboard/superadmin/leads', icon: UserSquare2, roles: ['superadmin'] },
     { name: 'Quotations', path: '/dashboard/quotations', icon: FileText, roles: ['admin', 'staff'] },
     { name: 'Payments', path: '/dashboard/payments', icon: CreditCard, roles: ['admin', 'staff'] },
+    { name: 'Payments', path: '/dashboard/superadmin/payments', icon: CreditCard, roles: ['superadmin'] },
     { name: 'Invoices', path: '/dashboard/invoices', icon: Receipt, roles: ['admin', 'staff'] },
+    { name: 'Invoices', path: '/dashboard/superadmin/invoices', icon: Receipt, roles: ['superadmin'] },
+    { name: 'Logs', path: '/dashboard/superadmin/logs', icon: Terminal, roles: ['superadmin'] },
+    { name: 'Settings', path: '/dashboard/superadmin/settings', icon: Settings, roles: ['superadmin'] },
   ];
 
   const filteredNav = navItems.filter(item => item.roles.includes(user?.role));
