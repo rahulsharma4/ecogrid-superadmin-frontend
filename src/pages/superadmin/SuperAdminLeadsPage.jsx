@@ -79,7 +79,7 @@ const SuperAdminLeadsPage = () => {
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Global Leads');
-    XLSX.writeFile(workbook, `EcoGrid_Global_Leads_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.writeFile(workbook, `SolarHub_Global_Leads_${new Date().toISOString().slice(0, 10)}.xlsx`);
     toast.success('Leads database exported to Excel successfully!');
   };
 

@@ -59,7 +59,7 @@ const RegisterPage = () => {
                  <img src={logo} alt="Logo" className="h-12 w-auto" />
               </div>
               <h1 className="text-5xl font-black text-white mt-8 tracking-tighter leading-tight">
-                 Join the<br/><span className="text-[#3f7abe]">EcoGrid Team.</span>
+                 Join the<br/><span className="text-[#3f7abe]">Solar Hub Team.</span>
               </h1>
               <p className="text-white/70 text-lg mt-6 font-medium max-w-sm">
                  Create your operator account to start managing sustainable energy projects.

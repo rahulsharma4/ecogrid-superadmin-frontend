@@ -10,7 +10,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem('userInfo');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      
+      // Async branding sync in the background
+      axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/company-by-email?email=${parsedUser.email}`)
+        .then(({ data }) => {
+          if (data && data.companyName) {
+            parsedUser.companyDetails = data;
+            setUser({ ...parsedUser });
+            localStorage.setItem('userInfo', JSON.stringify(parsedUser));
+          }
+        })
+        .catch(err => console.error('Failed to sync company details:', err));
     }
     setLoading(false);
   }, []);

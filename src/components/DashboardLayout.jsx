@@ -25,6 +25,188 @@ import {
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuth();
+
+  const themeColor = user?.companyDetails?.themeColor || '#3f7abe';
+  const themeColorSecondary = user?.companyDetails?.themeColorSecondary || '#f6871e';
+
+  useEffect(() => {
+    // Dynamic favicon logic
+    const faviconLink = document.querySelector("link[rel*='icon']");
+    if (faviconLink) {
+      faviconLink.href = user?.companyDetails?.companyLogo || logo;
+    }
+    // Dynamic document title logic
+    const companyName = user?.companyDetails?.companyName || 'Solar Hub';
+    document.title = `${companyName} CRM | Command Center`;
+
+    const style = document.createElement('style');
+    style.id = 'dynamic-theme-style';
+    style.innerHTML = `
+      :root {
+        --color-primary: ${themeColor} !important;
+        --color-secondary: ${themeColorSecondary} !important;
+        --primary-theme-color: ${themeColor};
+        --secondary-theme-color: ${themeColorSecondary};
+      }
+      
+      /* Global elements overrides */
+      .btn-primary:hover {
+        background-color: color-mix(in srgb, var(--color-primary) 85%, black) !important;
+        box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--color-primary) 30%, transparent) !important;
+      }
+      .btn-secondary:hover {
+        background-color: color-mix(in srgb, var(--color-secondary) 85%, black) !important;
+        box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--color-secondary) 30%, transparent) !important;
+      }
+      .input-field:focus {
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+      }
+
+      /* Tailwind arbitrary class overrides for primary (#3f7abe) */
+      .bg-\\[\\#3f7abe\\] {
+        background-color: var(--primary-theme-color) !important;
+      }
+      .text-\\[\\#3f7abe\\] {
+        color: var(--primary-theme-color) !important;
+      }
+      .border-\\[\\#3f7abe\\] {
+        border-color: var(--primary-theme-color) !important;
+      }
+      .focus\\:border-\\[\\#3f7abe\\]:focus {
+        border-color: var(--primary-theme-color) !important;
+      }
+      .hover\\:text-\\[\\#3f7abe\\]:hover {
+        color: var(--primary-theme-color) !important;
+      }
+      .hover\\:bg-\\[\\#3f7abe\\]:hover {
+        background-color: var(--primary-theme-color) !important;
+      }
+      .group:hover .group-hover\\:text-\\[\\#3f7abe\\] {
+        color: var(--primary-theme-color) !important;
+      }
+      .hover\\:bg-\\[\\#33629c\\]:hover {
+        background-color: color-mix(in srgb, var(--primary-theme-color) 85%, black) !important;
+      }
+      .bg-\\[\\#33629c\\] {
+        background-color: color-mix(in srgb, var(--primary-theme-color) 85%, black) !important;
+      }
+
+      /* Primary shadow overrides */
+      .shadow-\\[\\#3f7abe\\]\\/20 {
+        --tw-shadow-color: color-mix(in srgb, var(--primary-theme-color) 20%, transparent) !important;
+      }
+      .shadow-\\[\\#3f7abe\\]\\/25 {
+        --tw-shadow-color: color-mix(in srgb, var(--primary-theme-color) 25%, transparent) !important;
+      }
+      .shadow-\\[\\#3f7abe\\]\\/30 {
+        --tw-shadow-color: color-mix(in srgb, var(--primary-theme-color) 30%, transparent) !important;
+      }
+      .shadow-\\[\\#3f7abe\\]\\/40 {
+        --tw-shadow-color: color-mix(in srgb, var(--primary-theme-color) 40%, transparent) !important;
+      }
+      .shadow-xl\\/20 {
+        --tw-shadow-color: var(--primary-theme-color) !important;
+      }
+
+      /* Primary opacity backgrounds / borders */
+      .bg-\\[\\#3f7abe\\]\\/5 {
+        background-color: color-mix(in srgb, var(--primary-theme-color) 5%, transparent) !important;
+      }
+      .bg-\\[\\#3f7abe\\]\\/10 {
+        background-color: color-mix(in srgb, var(--primary-theme-color) 10%, transparent) !important;
+      }
+      .bg-\\[\\#3f7abe\\]\\/20 {
+        background-color: color-mix(in srgb, var(--primary-theme-color) 20%, transparent) !important;
+      }
+      .border-\\[\\#3f7abe\\]\\/10 {
+        border-color: color-mix(in srgb, var(--primary-theme-color) 10%, transparent) !important;
+      }
+      .border-\\[\\#3f7abe\\]\\/20 {
+        border-color: color-mix(in srgb, var(--primary-theme-color) 20%, transparent) !important;
+      }
+      .selection\\:bg-\\[\\#3f7abe\\]\\/10::selection {
+        background-color: color-mix(in srgb, var(--primary-theme-color) 10%, transparent) !important;
+      }
+
+      /* Tailwind arbitrary class overrides for secondary (#f6871e) */
+      .bg-\\[\\#f6871e\\] {
+        background-color: var(--secondary-theme-color) !important;
+      }
+      .text-\\[\\#f6871e\\] {
+        color: var(--secondary-theme-color) !important;
+      }
+      .border-\\[\\#f6871e\\] {
+        border-color: var(--secondary-theme-color) !important;
+      }
+      .focus\\:border-\\[\\#f6871e\\]:focus {
+        border-color: var(--secondary-theme-color) !important;
+      }
+      .hover\\:text-\\[\\#f6871e\\]:hover {
+        color: var(--secondary-theme-color) !important;
+      }
+      .hover\\:bg-\\[\\#f6871e\\]:hover {
+        background-color: var(--secondary-theme-color) !important;
+      }
+      .group:hover .group-hover\\:text-\\[\\#f6871e\\] {
+        color: var(--secondary-theme-color) !important;
+      }
+      .hover\\:bg-\\[\\#e0761a\\]:hover {
+        background-color: color-mix(in srgb, var(--secondary-theme-color) 85%, black) !important;
+      }
+      .bg-\\[\\#e0761a\\] {
+        background-color: color-mix(in srgb, var(--secondary-theme-color) 85%, black) !important;
+      }
+
+      /* Secondary gradients */
+      .from-\\[\\#f6871e\\] {
+        --tw-gradient-from: var(--secondary-theme-color) !important;
+        --tw-gradient-to: color-mix(in srgb, var(--secondary-theme-color) 0%, transparent) !important;
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+      }
+      .to-\\[\\#f6871e\\] {
+        --tw-gradient-to: var(--secondary-theme-color) !important;
+      }
+
+      /* Secondary shadow overrides */
+      .shadow-\\[\\#f6871e\\]\\/20 {
+        --tw-shadow-color: color-mix(in srgb, var(--secondary-theme-color) 20%, transparent) !important;
+      }
+      .shadow-\\[\\#f6871e\\]\\/25 {
+        --tw-shadow-color: color-mix(in srgb, var(--secondary-theme-color) 25%, transparent) !important;
+      }
+      .shadow-\\[\\#f6871e\\]\\/30 {
+        --tw-shadow-color: color-mix(in srgb, var(--secondary-theme-color) 30%, transparent) !important;
+      }
+      .shadow-\\[\\#f6871e\\]\\/40 {
+        --tw-shadow-color: color-mix(in srgb, var(--secondary-theme-color) 40%, transparent) !important;
+      }
+
+      /* Secondary opacity backgrounds / borders */
+      .bg-\\[\\#f6871e\\]\\/5 {
+        background-color: color-mix(in srgb, var(--secondary-theme-color) 5%, transparent) !important;
+      }
+      .bg-\\[\\#f6871e\\]\\/10 {
+        background-color: color-mix(in srgb, var(--secondary-theme-color) 10%, transparent) !important;
+      }
+      .bg-\\[\\#f6871e\\]\\/20 {
+        background-color: color-mix(in srgb, var(--secondary-theme-color) 20%, transparent) !important;
+      }
+      .border-\\[\\#f6871e\\]\\/10 {
+        border-color: color-mix(in srgb, var(--secondary-theme-color) 10%, transparent) !important;
+      }
+      .border-\\[\\#f6871e\\]\\/20 {
+        border-color: color-mix(in srgb, var(--secondary-theme-color) 20%, transparent) !important;
+      }
+    `;
+    const existingStyle = document.getElementById('dynamic-theme-style');
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+    document.head.appendChild(style);
+    return () => {
+      style.remove();
+    };
+  }, [user, themeColor, themeColorSecondary]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
@@ -75,6 +257,7 @@ const DashboardLayout = ({ children }) => {
     { name: 'Invoices', path: '/dashboard/superadmin/invoices', icon: Receipt, roles: ['superadmin'] },
     { name: 'Logs', path: '/dashboard/superadmin/logs', icon: Terminal, roles: ['superadmin'] },
     { name: 'Settings', path: '/dashboard/superadmin/settings', icon: Settings, roles: ['superadmin'] },
+    { name: 'Company Settings', path: '/dashboard/company-settings', icon: Settings, roles: ['admin'] },
   ];
 
   const filteredNav = navItems.filter(item => item.roles.includes(user?.role));
@@ -132,11 +315,15 @@ const DashboardLayout = ({ children }) => {
       `}>
         {/* Brand Section */}
         <div className="p-6 flex items-center gap-3">
-          <img src={logo} alt="Logo" className="h-8 w-8 object-contain rounded-lg shadow-sm" />
+          <img src={user?.companyDetails?.companyLogo || logo} alt="Logo" className="h-8 w-8 object-contain rounded-lg shadow-sm" />
           {isSidebarOpen && (
             <div className="flex flex-col truncate animate-in fade-in duration-500">
-              <span className="text-lg font-bold text-[#3f7abe] leading-none">EcoGrid</span>
-              <span className="text-[9px] font-bold text-[#f6871e] uppercase tracking-wider mt-1 opacity-90">Infra Pvt Ltd</span>
+              <span className="text-sm font-black text-[#3f7abe] leading-none truncate max-w-[150px]">
+                {user?.companyDetails?.companyName || 'Solar Hub'}
+              </span>
+              <span className="text-[8px] font-black text-[#f6871e] uppercase tracking-wider mt-1 opacity-90 truncate max-w-[150px]">
+                {user?.companyDetails?.companySubHeader || 'Solar Command'}
+              </span>
             </div>
           )}
         </div>
@@ -213,8 +400,10 @@ const DashboardLayout = ({ children }) => {
               {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
             <div className="lg:hidden flex items-center gap-2">
-              <img src={logo} alt="Logo" className="h-6 w-6" />
-              <span className="font-black text-[#3f7abe] text-sm tracking-tight">EcoGrid</span>
+              <img src={user?.companyDetails?.companyLogo || logo} alt="Logo" className="h-6 w-6 object-contain rounded" />
+              <span className="font-black text-[#3f7abe] text-sm tracking-tight">
+                {user?.companyDetails?.companyName || 'Solar Hub'}
+              </span>
             </div>
           </div>
           

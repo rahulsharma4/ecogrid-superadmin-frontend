@@ -1,7 +1,7 @@
 {
-  "short_name": "EcoGrid",
-  "name": "EcoGrid CRM Command Center",
-  "description": "Enterprise CRM and Project Command Center for EcoGrid Infra",
+  "short_name": "Solar Hub",
+  "name": "Solar Hub CRM Command Center",
+  "description": "Enterprise CRM and Project Command Center for Solar Hub",
   "icons": [
     {
       "src": "favicon.svg",

@@ -387,21 +387,21 @@ const PaymentsPage = () => {
                   <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-100 animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="space-y-1">
                       <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">UPI Transaction ID / Ref No *</label>
-                      <input type="text" required value={formData.referenceNo} onChange={e => setFormData({...formData, referenceNo: e.target.value})} placeholder="e.g. 6388908096" className="input-field bg-white" />
+                      <input type="text" required value={formData.referenceNo} onChange={e => setFormData({...formData, referenceNo: e.target.value})} placeholder="e.g. Ref ID" className="input-field bg-white" />
                     </div>
                     <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl border border-slate-100 gap-2 animate-in fade-in duration-300">
                       <p className="text-[9px] font-black text-[#3f7abe] uppercase tracking-wider text-center">
-                        {formData.amount && Number(formData.amount) > 0 ? 'Scan & Pay Dynamic QR' : 'Scan & Pay QR (Enter Amount on Phone)'}
+                        {user?.companyDetails?.paymentQrCode ? 'Scan QR to Pay' : (formData.amount && Number(formData.amount) > 0 ? 'Scan & Pay Dynamic QR' : 'Scan & Pay QR (Enter Amount on Phone)')}
                       </p>
                       <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
-                          `upi://pay?pa=6388908096m@pnb&pn=ECOGRID%20INFRA%20PRIVATE%20LIMITED${formData.amount && Number(formData.amount) > 0 ? `&am=${formData.amount}` : ''}&cu=INR&tn=${encodeURIComponent(`${formData.paymentType} Ref ${formData.leadId ? formData.leadId.slice(-6).toUpperCase() : ''}`)}`
+                        src={user?.companyDetails?.paymentQrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+                          `upi://pay?pa=${user?.companyDetails?.upiId || 'solarhub@upi'}&pn=${encodeURIComponent(user?.companyDetails?.payeeName || 'SOLAR HUB PRIVATE LIMITED')}${formData.amount && Number(formData.amount) > 0 ? `&am=${formData.amount}` : ''}&cu=INR&tn=${encodeURIComponent(`${formData.paymentType} Ref ${formData.leadId ? formData.leadId.slice(-6).toUpperCase() : ''}`)}`
                         )}`} 
                         alt="UPI QR Code" 
-                        className="w-36 h-36 border border-slate-100 rounded-lg shadow-sm" 
+                        className="w-36 h-36 border border-slate-100 rounded-lg shadow-sm object-contain p-1" 
                       />
-                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-center mt-1">UPI ID: 6388908096m@pnb</p>
-                      <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest text-center">Payee: ECOGRID INFRA PRIVATE LIMITED</p>
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest text-center mt-1">UPI ID: {user?.companyDetails?.upiId || 'solarhub@upi'}</p>
+                      <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest text-center">Payee: {user?.companyDetails?.payeeName || 'SOLAR HUB PRIVATE LIMITED'}</p>
                     </div>
                   </div>
                 )}
@@ -419,11 +419,13 @@ const PaymentsPage = () => {
                       </div>
                     </div>
                     <div className="p-4 bg-white rounded-xl border border-slate-100 space-y-1 text-xs">
-                      <p className="text-[9px] font-black text-[#3f7abe] uppercase tracking-wider mb-2">PNB Current Account Details</p>
-                      <p className="font-bold text-slate-700">Name: <span className="text-slate-900 font-extrabold">ECOGRID INFRA PRIVATE LIMITED</span></p>
-                      <p className="font-bold text-slate-700">A/c No: <span className="text-slate-900 font-extrabold">6193002100004183</span></p>
-                      <p className="font-bold text-slate-700">IFSC: <span className="text-slate-900 font-extrabold">PUNB0619300</span></p>
-                      <p className="font-bold text-slate-700">Branch: <span className="text-slate-900 font-extrabold">Vibhuti Khand, Gomti Nagar, Lucknow</span></p>
+                      <p className="text-[9px] font-black text-[#3f7abe] uppercase tracking-wider mb-2">{(user?.companyDetails?.bankName || 'Settlement Bank').toUpperCase()} Account Details</p>
+                      <p className="font-bold text-slate-700">Name: <span className="text-slate-900 font-extrabold">{user?.companyDetails?.payeeName || 'SOLAR HUB PRIVATE LIMITED'}</span></p>
+                      <p className="font-bold text-slate-700">A/c No: <span className="text-slate-900 font-extrabold">{user?.companyDetails?.bankAccountNo || '123456789012'}</span></p>
+                      <p className="font-bold text-slate-700">IFSC: <span className="text-slate-900 font-extrabold">{user?.companyDetails?.bankIfsc || 'SBIN0001234'}</span></p>
+                      {!(user?.companyDetails?.bankAccountNo) && (
+                        <p className="font-bold text-slate-700">Branch: <span className="text-slate-900 font-extrabold">Main Corporate Branch</span></p>
+                      )}
                     </div>
                   </div>
                 )}

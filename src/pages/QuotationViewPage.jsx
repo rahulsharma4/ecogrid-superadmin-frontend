@@ -17,33 +17,46 @@ import solarRoof3 from '../assets/solar_roof_3.png';
 import solarRail from '../assets/solar_rail.png';
 import endEngineerImg from '../assets/end_engineer.png';
 
-const TopRightTriangle = () => (
+const TopRightTriangle = ({ themeColor, secondaryThemeColor }) => (
   <div style={{ position: 'absolute', top: 0, right: 0, width: '300px', height: '200px', zIndex: 0 }}>
     <svg width="100%" height="100%" viewBox="0 0 300 200" preserveAspectRatio="none">
-      <polygon points="300,0 300,200 120,0" fill="#3f7abe" />
-      <polygon points="300,200 180,200 300,100" fill="#f6871e" />
+      <polygon points="300,0 300,200 120,0" fill={themeColor || '#3f7abe'} />
+      <polygon points="300,200 180,200 300,100" fill={secondaryThemeColor || '#f6871e'} />
     </svg>
   </div>
 );
 
-const BottomLeftTriangle = () => (
+const BottomLeftTriangle = ({ themeColor, secondaryThemeColor }) => (
   <div style={{ position: 'absolute', bottom: 0, left: 0, width: '300px', height: '200px', zIndex: 0 }}>
     <svg width="100%" height="100%" viewBox="0 0 300 200" preserveAspectRatio="none">
-      <polygon points="0,200 0,0 180,200" fill="#3f7abe" />
-      <polygon points="0,0 120,0 0,100" fill="#f6871e" />
+      <polygon points="0,200 0,0 180,200" fill={themeColor || '#3f7abe'} />
+      <polygon points="0,0 120,0 0,100" fill={secondaryThemeColor || '#f6871e'} />
     </svg>
   </div>
 );
 
-const LogoHeader = ({ logo }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '15px', position: 'relative', zIndex: 10 }}>
-    {logo && <img src={logo} alt="Logo" style={{ height: '48px', width: '48px', borderRadius: '50%', objectFit: 'cover' }} />}
-    <div>
-      <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: '#3f7abe', lineHeight: '1.1', letterSpacing: '0.5px' }}>Solar</h2>
-      <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#f6871e', lineHeight: '1.1', letterSpacing: '0.5px' }}>Eco Grid</h2>
+const LogoHeader = ({ logo, themeColor, secondaryThemeColor, companyName }) => {
+  const primaryColor = themeColor || '#3f7abe';
+  const secColor = secondaryThemeColor || '#f6871e';
+  let firstPart = 'Solar';
+  let secondPart = 'Hub';
+  
+  if (companyName) {
+    const parts = companyName.split(' ');
+    firstPart = parts[0];
+    secondPart = parts.slice(1).join(' ');
+  }
+  
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', position: 'relative', zIndex: 10 }}>
+      {logo && <img src={logo} alt="Logo" style={{ height: '48px', width: '48px', borderRadius: '50%', objectFit: 'cover' }} />}
+      <div>
+        <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '900', color: primaryColor, lineHeight: '1.1', letterSpacing: '0.5px' }}>{firstPart}</h2>
+        {secondPart && <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: secColor, lineHeight: '1.1', letterSpacing: '0.5px' }}>{secondPart}</h2>}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const QuotationViewPage = () => {
   const { id } = useParams();
@@ -110,8 +123,12 @@ const QuotationViewPage = () => {
           });
         };
         
-        const logoB64 = await toBase64(logoImg);
-        setLogoBase64(logoB64);
+        if (user?.companyDetails?.companyLogo) {
+          setLogoBase64(user.companyDetails.companyLogo);
+        } else {
+          const logoB64 = await toBase64(logoImg);
+          setLogoBase64(logoB64);
+        }
 
         const imgs = {
           cover: await toBase64(coverEngineerImg),
@@ -137,7 +154,7 @@ const QuotationViewPage = () => {
       } catch (err) { console.error(err); } finally { setLoading(false); }
     };
     fetchQuotation();
-  }, [id, user.token]);
+  }, [id, user.token, user?.companyDetails]);
 
   useEffect(() => {
     if (!loading && quotation) {
@@ -155,6 +172,13 @@ const QuotationViewPage = () => {
   const netPrice = quotation.netPrice || 0;
   const netEffective = Math.max(0, netPrice - (quotation.centralSubsidy || 0) - (quotation.stateSubsidy || 0));
   const year = new Date(quotation.date || Date.now()).getFullYear();
+
+  const primaryThemeColor = user?.companyDetails?.themeColor || '#3f7abe';
+  const secondaryThemeColor = user?.companyDetails?.themeColorSecondary || '#f6871e';
+  const companyName = user?.companyDetails?.companyName || 'Solar Hub';
+  const nameParts = companyName.split(' ');
+  const firstPartCover = nameParts[0] || '';
+  const secondPartCover = nameParts.slice(1).join(' ') || '';
 
   const pageStyle = {
     width: '210mm',
@@ -184,7 +208,7 @@ const QuotationViewPage = () => {
               Edit Proposal
             </button>
           )}
-          <button disabled={isDownloading} onClick={handleDownload} className="flex items-center gap-2 px-10 py-5 bg-[#3f7abe] hover:bg-[#33629c] text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-[#3f7abe]/30 transition-all">
+          <button disabled={isDownloading} onClick={handleDownload} style={{ backgroundColor: primaryThemeColor }} className="flex items-center gap-2 px-10 py-5 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200/50 hover:opacity-90 transition-all">
             {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
             {isDownloading ? 'Downloading...' : 'Download Full Proposal'}
           </button>
@@ -194,13 +218,13 @@ const QuotationViewPage = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', alignItems: 'center' }}>
         
         {/* PAGE 1: COVER PAGE */}
-        <div ref={el => pagesRef.current[0] = el} style={{ ...pageStyle, background: 'linear-gradient(180deg, #3f7abe 0%, #204c82 70%, #f6871e 100%)', padding: '40px 30px', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div ref={el => pagesRef.current[0] = el} style={{ ...pageStyle, background: `linear-gradient(180deg, ${primaryThemeColor} 0%, color-mix(in srgb, ${primaryThemeColor} 60%, black) 70%, ${secondaryThemeColor} 100%)`, padding: '40px 30px', justifyContent: 'space-between', alignItems: 'center' }}>
           {/* Top Logo Container */}
           <div style={{ background: '#ffffff', borderRadius: '30px', padding: '12px 36px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', marginTop: '20px', zIndex: 10 }}>
             {logoBase64 && <img src={logoBase64} alt="Logo" style={{ height: '40px', width: '40px', borderRadius: '50%', objectFit: 'cover' }} />}
             <span style={{ fontSize: '22px', fontWeight: '900', letterSpacing: '0.5px' }}>
-              <span style={{ color: '#3f7abe' }}>SOLAR </span>
-              <span style={{ color: '#f6871e' }}>ECO GRID</span>
+              <span style={{ color: primaryThemeColor }}>{firstPartCover.toUpperCase()} </span>
+              {secondPartCover && <span style={{ color: secondaryThemeColor }}>{secondPartCover.toUpperCase()}</span>}
             </span>
           </div>
 
@@ -227,8 +251,8 @@ const QuotationViewPage = () => {
           {/* Footer Band */}
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px', zIndex: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 15px' }}>
-              <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: '700', letterSpacing: '0.5px' }}>www.solarecogrid.in</span>
-              <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: '700', letterSpacing: '0.5px' }}>+91 9889555339</span>
+              <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: '700', letterSpacing: '0.5px' }}>{user?.companyDetails?.websiteUrl || 'www.solarhub.com'}</span>
+              <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: '700', letterSpacing: '0.5px' }}>{user?.companyDetails?.supportPhone || '+91 9999999999'}</span>
             </div>
             {/* Accent colored bottom line */}
             <div style={{ height: '5px', width: '100%', background: '#ffffff', borderRadius: '999px', opacity: 0.8 }}></div>
@@ -236,11 +260,11 @@ const QuotationViewPage = () => {
         </div>
 
         {/* PAGE 2: FINAL OUTPUT */}
-        <div ref={el => pagesRef.current[1] = el} style={{ ...pageStyle, background: 'linear-gradient(180deg, #3f7abe 0%, #1e4575 100%)', padding: '40px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div ref={el => pagesRef.current[1] = el} style={{ ...pageStyle, background: `linear-gradient(180deg, ${primaryThemeColor} 0%, #1e4575 100%)`, padding: '40px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           {/* Subtle decorative concentric circle backgrounds */}
           <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)', zIndex: 0 }}></div>
           
-          <LogoHeader logo={logoBase64} />
+          <LogoHeader logo={logoBase64} themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} companyName={companyName} />
 
           <div style={{ textAlign: 'center', margin: '15px 0', zIndex: 10 }}>
             <h1 style={{ fontSize: '32px', fontWeight: '900', color: '#ffffff', margin: '0 0 5px 0', letterSpacing: '0.5px' }}>Final Output</h1>
@@ -262,7 +286,7 @@ const QuotationViewPage = () => {
             justifyContent: 'center',
             maxHeight: '620px'
           }}>
-            <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#3f7abe', textAlign: 'center', margin: 0, letterSpacing: '0.5px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '900', color: primaryThemeColor, textAlign: 'center', margin: 0, letterSpacing: '0.5px' }}>
               "GO GREEN GO SOLAR"
             </h2>
             <div style={{ flex: 1, borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
@@ -276,14 +300,14 @@ const QuotationViewPage = () => {
 
           {/* Footer */}
           <div style={{ textAlign: 'center', zIndex: 10, borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '15px', marginTop: '15px' }}>
-            <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: '700', letterSpacing: '0.5px' }}>www.solarecogrid.com</span>
+            <span style={{ fontSize: '13px', color: '#ffffff', fontWeight: '700', letterSpacing: '0.5px' }}>{user?.companyDetails?.websiteUrl || 'www.solarhub.com'}</span>
           </div>
         </div>
 
         {/* PAGE 3: OUR OFFER FOR YOU */}
         <div ref={el => pagesRef.current[2] = el} style={{ 
           ...pageStyle, 
-          background: 'linear-gradient(180deg, #3f7abe 0%, #204675 100%)', 
+          background: `linear-gradient(180deg, ${primaryThemeColor} 0%, #204675 100%)`, 
           padding: '30px 25px', 
           color: 'white',
           display: 'flex',
@@ -318,7 +342,7 @@ const QuotationViewPage = () => {
           }}>
             {/* Customer Details */}
             <div style={{ marginBottom: '15px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: '900', color: '#3f7abe', margin: '0 0 4px 0' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: '900', color: primaryThemeColor, margin: '0 0 4px 0' }}>
                 {quotation.lead?.name || 'Customer'}
               </h2>
               <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b', margin: 0 }}>
@@ -340,7 +364,7 @@ const QuotationViewPage = () => {
               {/* Item 1: System Size */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -361,7 +385,7 @@ const QuotationViewPage = () => {
               {/* Item 2: Solar Panels */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -386,7 +410,7 @@ const QuotationViewPage = () => {
               {/* Item 3: Inverter */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -409,7 +433,7 @@ const QuotationViewPage = () => {
               {/* Item 4: Quotation Date */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -432,7 +456,7 @@ const QuotationViewPage = () => {
               {/* Item 5: Structure Type */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -455,7 +479,7 @@ const QuotationViewPage = () => {
               {/* Item 6: Cleaning Frequency */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -476,7 +500,7 @@ const QuotationViewPage = () => {
               {/* Item 7: Offering */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -492,14 +516,14 @@ const QuotationViewPage = () => {
                 </div>
                 <div>
                   <div style={{ fontSize: '8px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Offering</div>
-                  <div style={{ fontSize: '11px', fontWeight: '900', color: '#1e293b' }}>{quotation.offering || 'EcoGrid'}</div>
+                  <div style={{ fontSize: '11px', fontWeight: '900', color: '#1e293b' }}>{quotation.offering || user?.companyDetails?.companyName || 'Solar Hub'}</div>
                 </div>
               </div>
 
               {/* Item 8: Floor Height */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -520,7 +544,7 @@ const QuotationViewPage = () => {
               {/* Item 9: GSM Based */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -541,7 +565,7 @@ const QuotationViewPage = () => {
               {/* Item 10: Inverter Location */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ 
-                  backgroundColor: '#3f7abe', 
+                  backgroundColor: primaryThemeColor, 
                   borderRadius: '50%', 
                   width: '32px', 
                   height: '32px', 
@@ -565,8 +589,8 @@ const QuotationViewPage = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid #cbd5e1' }}>
-                    <th style={{ textAlign: 'left', padding: '6px 4px', fontWeight: '900', color: '#3f7abe', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.5px' }}>Price</th>
-                    <th style={{ textAlign: 'right', padding: '6px 4px', fontWeight: '900', color: '#3f7abe', textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.5px' }}>Cost</th>
+                    <th style={{ textAlign: 'left', padding: '6px 4px', fontWeight: '900', color: primaryThemeColor, textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.5px' }}>Price</th>
+                    <th style={{ textAlign: 'right', padding: '6px 4px', fontWeight: '900', color: primaryThemeColor, textTransform: 'uppercase', fontSize: '10px', letterSpacing: '0.5px' }}>Cost</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -637,9 +661,9 @@ const QuotationViewPage = () => {
 
                   {/* Net Effective Price Highlight Row */}
                   <tr style={{ 
-                    background: 'linear-gradient(90deg, #f6871e 0%, #fb923c 100%)', 
+                    background: `linear-gradient(90deg, ${secondaryThemeColor} 0%, color-mix(in srgb, ${secondaryThemeColor} 80%, white) 100%)`, 
                     borderRadius: '8px', 
-                    boxShadow: '0 2px 5px rgba(246,135,30,0.2)'
+                    boxShadow: `0 2px 5px color-mix(in srgb, ${secondaryThemeColor} 20%, transparent)`
                   }}>
                     <td style={{ padding: '8px 10px', fontWeight: '900', color: '#ffffff', borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}>
                       Net Effective Price*
@@ -670,30 +694,30 @@ const QuotationViewPage = () => {
           {/* Footer Website link */}
           <div style={{ textAlign: 'center', marginTop: '12px', zIndex: 10 }}>
             <span style={{ fontSize: '13px', color: 'white', fontWeight: '700', letterSpacing: '0.5px' }}>
-              www.solarecogrid.com
+              {user?.companyDetails?.websiteUrl || 'www.solarhub.com'}
             </span>
           </div>
         </div>
 
         {/* PAGE 4: TECHNICAL SPECS TABLE */}
         <div ref={el => pagesRef.current[3] = el} style={{ ...pageStyle, padding: '45px 30px' }}>
-          <TopRightTriangle />
-          <BottomLeftTriangle />
+          <TopRightTriangle themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} />
+          <BottomLeftTriangle themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} />
           
-          <LogoHeader logo={logoBase64} />
+          <LogoHeader logo={logoBase64} themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} companyName={companyName} />
           
-          <h2 style={{ fontSize: '20px', fontWeight: '900', color: '#3f7abe', marginTop: '35px', marginBottom: '20px', position: 'relative', zIndex: 10, letterSpacing: '0.5px' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '900', color: primaryThemeColor, marginTop: '35px', marginBottom: '20px', position: 'relative', zIndex: 10, letterSpacing: '0.5px' }}>
             Details about the System {quotation.systemSize} On-Grid
           </h2>
           
           <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'center', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-              <thead style={{ backgroundColor: '#e0ebf6', borderBottom: '2px solid #3f7abe' }}>
+              <thead style={{ backgroundColor: '#e0ebf6', borderBottom: `2px solid ${primaryThemeColor}` }}>
                 <tr>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: '#3f7abe', width: '25%' }}>Item/Component</th>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: '#3f7abe', width: '40%' }}>Details</th>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: '#3f7abe', width: '18%' }}>Make</th>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: '#3f7abe', width: '17%' }}>Quantity</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: primaryThemeColor, width: '25%' }}>Item/Component</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: primaryThemeColor, width: '40%' }}>Details</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: primaryThemeColor, width: '18%' }}>Make</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px 8px', fontSize: '11px', fontWeight: '900', color: primaryThemeColor, width: '17%' }}>Quantity</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: '10.5px', color: '#334155' }}>
@@ -768,42 +792,42 @@ const QuotationViewPage = () => {
                 <tr>
                   <td style={{ border: '1px solid #cbd5e1', padding: '8px 6px', fontWeight: 'bold' }}>Installation & Labour</td>
                   <td style={{ border: '1px solid #cbd5e1', padding: '8px 6px' }}>{quotation.installationDetails || 'Complete setup'}</td>
-                  <td style={{ border: '1px solid #cbd5e1', padding: '8px 6px' }}>{quotation.installationMake || 'EcoGrid'}</td>
+                  <td style={{ border: '1px solid #cbd5e1', padding: '8px 6px' }}>{quotation.installationMake || companyName}</td>
                   <td style={{ border: '1px solid #cbd5e1', padding: '8px 6px' }}>{quotation.installationQty || 'Each'}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-
+          
           <div style={{ textAlign: 'center', zIndex: 10, marginTop: '20px', borderTop: '1px solid #cbd5e1', paddingTop: '10px' }}>
-            <span style={{ fontSize: '13px', color: '#3f7abe', fontWeight: '700', letterSpacing: '0.5px' }}>www.solarecogrid.com</span>
+            <span style={{ fontSize: '13px', color: primaryThemeColor, fontWeight: '700', letterSpacing: '0.5px' }}>{user?.companyDetails?.websiteUrl || 'www.solarhub.com'}</span>
           </div>
         </div>
 
         {/* PAGE 5: WARRANTY AND SERVICES */}
         <div ref={el => pagesRef.current[4] = el} style={{ ...pageStyle, padding: '45px 30px' }}>
-          <TopRightTriangle />
-          <BottomLeftTriangle />
+          <TopRightTriangle themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} />
+          <BottomLeftTriangle themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} />
           
-          <LogoHeader logo={logoBase64} />
+          <LogoHeader logo={logoBase64} themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} companyName={companyName} />
           
-          <h1 style={{ fontSize: '24px', fontWeight: '900', color: '#3f7abe', marginTop: '35px', marginBottom: '20px', position: 'relative', zIndex: 10, letterSpacing: '0.5px' }}>
+          <h1 style={{ fontSize: '24px', fontWeight: '900', color: primaryThemeColor, marginTop: '35px', marginBottom: '20px', position: 'relative', zIndex: 10, letterSpacing: '0.5px' }}>
             Warranty and Services
           </h1>
           
           <div style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', gap: '15px', justifyContent: 'center' }}>
             {/* What you get table */}
             <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-              <thead style={{ backgroundColor: '#e0ebf6', borderBottom: '2px solid #3f7abe' }}>
+              <thead style={{ backgroundColor: '#e0ebf6', borderBottom: `2px solid ${primaryThemeColor}` }}>
                 <tr>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: '#3f7abe', fontSize: '11px', fontWeight: '900', width: '50%' }}>What You Get</th>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: '#3f7abe', fontSize: '11px', fontWeight: '900', width: '50%' }}>What Is Not Included</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: primaryThemeColor, fontSize: '11px', fontWeight: '900', width: '50%' }}>What You Get</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: primaryThemeColor, fontSize: '11px', fontWeight: '900', width: '50%' }}>What Is Not Included</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: '9px', color: '#475569' }}>
                 <tr>
                   <td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', lineHeight: '1.4' }}>
-                    <b>Zero paper cost guarantee:</b> Solar Eco Grid selects the most suitable components that go in your solar plant. you don't have to pay out of your pocket for any repairs, replacements or spare parts that are required during regular maintenance over the next 5 year.
+                    <b>Zero paper cost guarantee:</b> {companyName} selects the most suitable components that go in your solar plant. you don't have to pay out of your pocket for any repairs, replacements or spare parts that are required during regular maintenance over the next 5 year.
                   </td>
                   <td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', lineHeight: '1.4' }}>
                     Any external damage due to human intervention or unpredictable nature events will make the warranty void.
@@ -819,7 +843,7 @@ const QuotationViewPage = () => {
                 </tr>
                 <tr>
                   <td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', lineHeight: '1.4' }}>
-                    <b>Anti Cyclone:</b><br/>Your structures are certified for high wind speeds of upto 150 KMPH. In case there is any damage due to cyclone below this threshold, Solar Eco Grid will repair/replace for free.
+                    <b>Anti Cyclone:</b><br/>Your structures are certified for high wind speeds of upto 150 KMPH. In case there is any damage due to cyclone below this threshold, {companyName} will repair/replace for free.
                   </td>
                   <td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', lineHeight: '1.4' }}>
                     Any external damage due to human intervention.
@@ -838,41 +862,51 @@ const QuotationViewPage = () => {
 
             {/* Components Warranty List */}
             <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
-              <thead style={{ backgroundColor: '#e0ebf6', borderBottom: '2px solid #3f7abe' }}>
+              <thead style={{ backgroundColor: '#e0ebf6', borderBottom: `2px solid ${primaryThemeColor}` }}>
                 <tr>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: '#3f7abe', fontSize: '11px', fontWeight: '900', width: '70%' }}>Components</th>
-                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: '#3f7abe', fontSize: '11px', fontWeight: '900', width: '30%' }}>Years</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: primaryThemeColor, fontSize: '11px', fontWeight: '900', width: '70%' }}>Components</th>
+                  <th style={{ border: '1px solid #cbd5e1', padding: '10px', textAlign: 'left', color: primaryThemeColor, fontSize: '11px', fontWeight: '900', width: '30%' }}>Years</th>
                 </tr>
               </thead>
               <tbody style={{ fontSize: '10px', color: '#334155', fontWeight: '700' }}>
-                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Solar Panel (production)</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: '#3f7abe' }}>30 years</td></tr>
-                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Solar Panel (product)</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: '#3f7abe' }}>12 years</td></tr>
-                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Inverter</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: '#3f7abe' }}>7-10 years</td></tr>
-                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Other components</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: '#3f7abe' }}>5 years</td></tr>
-                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Plant performance guarantee</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: '#3f7abe' }}>Applicable</td></tr>
+                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Solar Panel (production)</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: primaryThemeColor }}>30 years</td></tr>
+                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Solar Panel (product)</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: primaryThemeColor }}>12 years</td></tr>
+                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Inverter</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: primaryThemeColor }}>7-10 years</td></tr>
+                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Other components</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: primaryThemeColor }}>5 years</td></tr>
+                <tr><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px' }}>Plant performance guarantee</td><td style={{ border: '1px solid #cbd5e1', padding: '8px 10px', color: primaryThemeColor }}>Applicable</td></tr>
               </tbody>
             </table>
 
             {/* Terms and Conditions */}
             <div style={{ fontSize: '8px', color: '#64748b', lineHeight: '1.4', borderTop: '1px solid #cbd5e1', paddingTop: '8px' }}>
               <b>Terms and Conditions</b><br/>
-              1. Additional charges may apply for changes to your electricity bill, such as load, name, or phase adjustments.<br/>
-              2. Please provide all necessary documents, including PAN card, Aadhaar card, and electricity bill.<br/>
-              3. Customers opting for financing may need to submit extra documents.<br/>
-              4. Delays due to missing documents are not Solar Eco Grid's responsibility.<br/>
-              5. Our Solar system will generate average of 4 units per kw of electricity depending upon service and maintenance.
+              {user?.companyDetails?.termsAndConditions ? (
+                user.companyDetails.termsAndConditions.split('\n').map((term, tIdx) => (
+                  <React.Fragment key={tIdx}>
+                    {term}<br/>
+                  </React.Fragment>
+                ))
+              ) : (
+                <>
+                  1. Additional charges may apply for changes to your electricity bill, such as load, name, or phase adjustments.<br/>
+                  2. Please provide all necessary documents, including PAN card, Aadhaar card, and electricity bill.<br/>
+                  3. Customers opting for financing may need to submit extra documents.<br/>
+                  4. Delays due to missing documents are not {companyName}\'s responsibility.<br/>
+                  5. Our Solar system will generate average of 4 units per kw of electricity depending upon service and maintenance.
+                </>
+              )}
             </div>
           </div>
 
           <div style={{ textAlign: 'center', zIndex: 10, marginTop: '20px', borderTop: '1px solid #cbd5e1', paddingTop: '10px' }}>
-            <span style={{ fontSize: '13px', color: '#3f7abe', fontWeight: '700', letterSpacing: '0.5px' }}>www.solarecogrid.com</span>
+            <span style={{ fontSize: '13px', color: primaryThemeColor, fontWeight: '700', letterSpacing: '0.5px' }}>{user?.companyDetails?.websiteUrl || 'www.solarhub.com'}</span>
           </div>
         </div>
 
         {/* PAGE 6: CONTACT US / BACK COVER */}
         <div ref={el => pagesRef.current[5] = el} style={{ ...pageStyle, padding: 0, justifyContent: 'space-between', display: 'flex', flexDirection: 'column' }}>
           {/* Top Half: Solar panels photo */}
-          <div style={{ width: '100%', height: '35%', relative: 'position', overflow: 'hidden' }}>
+          <div style={{ width: '100%', height: '35%', position: 'relative', overflow: 'hidden' }}>
             {imagesBase64.roof2 ? (
               <img src={imagesBase64.roof2} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Solar panels backdrop" />
             ) : (
@@ -883,16 +917,16 @@ const QuotationViewPage = () => {
           {/* Middle: Title cards */}
           <div style={{ padding: '0 30px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
             <span style={{ fontSize: '11px', fontWeight: '900', color: '#64748b', letterSpacing: '2px', textTransform: 'uppercase' }}>CONTACT US</span>
-            <h1 style={{ fontSize: '32px', fontWeight: '900', color: '#3f7abe', margin: 0, textAlign: 'center', letterSpacing: '0.5px', lineHeight: '1.2' }}>
-              ECOGRID INFRA PVT LTD
+            <h1 style={{ fontSize: '32px', fontWeight: '900', color: primaryThemeColor, margin: 0, textAlign: 'center', letterSpacing: '0.5px', lineHeight: '1.2' }}>
+              {companyName.toUpperCase()}
             </h1>
 
             {/* Logo Container */}
             <div style={{ background: '#ffffff', borderRadius: '30px', padding: '10px 28px', display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid #cbd5e1', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginTop: '5px' }}>
               {logoBase64 && <img src={logoBase64} alt="Logo" style={{ height: '35px', width: '35px', borderRadius: '50%', objectFit: 'cover' }} />}
               <span style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '0.5px' }}>
-                <span style={{ color: '#3f7abe' }}>SOLAR </span>
-                <span style={{ color: '#f6871e' }}>ECO GRID</span>
+                <span style={{ color: primaryThemeColor }}>{firstPartCover.toUpperCase()} </span>
+                {secondPartCover && <span style={{ color: secondaryThemeColor }}>{secondPartCover.toUpperCase()}</span>}
               </span>
             </div>
           </div>
@@ -904,14 +938,14 @@ const QuotationViewPage = () => {
             margin: '0 25px 25px 25px',
             alignItems: 'stretch'
           }}>
-            {/* Left Column: Orange card */}
+            {/* Left Column: Custom Theme Accent card */}
             <div style={{
               flex: '1.4',
-              background: '#f6871e',
+              background: secondaryThemeColor,
               color: 'white',
               borderRadius: '24px',
               padding: '24px 20px',
-              boxShadow: '0 8px 25px rgba(246,135,30,0.2)',
+              boxShadow: `0 8px 25px ${secondaryThemeColor}40`,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -923,8 +957,7 @@ const QuotationViewPage = () => {
                   <Phone size={16} color="white" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 'bold' }}>+91 9889555339</span>
-                  <span style={{ fontSize: '13px', fontWeight: 'bold' }}>+91 6388908096</span>
+                  <span style={{ fontSize: '13px', fontWeight: 'bold' }}>{user?.companyDetails?.supportPhone || '+91 9999999999'}</span>
                 </div>
               </div>
 
@@ -933,7 +966,7 @@ const QuotationViewPage = () => {
                 <div style={{ background: 'rgba(255,255,255,0.2)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Globe size={16} color="white" />
                 </div>
-                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>www.solarecogrid.in</span>
+                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>{user?.companyDetails?.websiteUrl || 'www.solarhub.com'}</span>
               </div>
 
               {/* Email Info */}
@@ -941,7 +974,7 @@ const QuotationViewPage = () => {
                 <div style={{ background: 'rgba(255,255,255,0.2)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Mail size={16} color="white" />
                 </div>
-                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>infosecogridinfra.in</span>
+                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>{user?.companyDetails?.supportEmail || 'support@solarhub.com'}</span>
               </div>
 
               {/* Address Info */}
@@ -950,7 +983,7 @@ const QuotationViewPage = () => {
                   <MapPin size={16} color="white" />
                 </div>
                 <span style={{ fontSize: '12px', fontWeight: 'bold', lineHeight: '1.4' }}>
-                  D-352, Vibhuti khand, Gomti Nagar Lucknow, 226010
+                  {user?.companyDetails?.companyAddress || 'D-352, Vibhuti khand, Gomti Nagar Lucknow, 226010'}
                 </span>
               </div>
             </div>
@@ -975,11 +1008,11 @@ const QuotationViewPage = () => {
                 <Zap size={10} fill="#16a34a" color="#16a34a" /> WhatsApp Contact
               </div>
               <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://wa.me/916388908096')}`}
+                src={user?.companyDetails?.whatsappQrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://wa.me/' + ((user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '916388908096').replace(/[^0-9]/g, '')))}`}
                 alt="WhatsApp QR Code" 
-                style={{ width: '105px', height: '105px', display: 'block', borderRadius: '8px' }} 
+                style={{ width: '105px', height: '105px', display: 'block', borderRadius: '8px', objectFit: 'contain' }} 
               />
-              <p style={{ fontSize: '9px', fontWeight: '800', color: '#64748b', margin: 0 }}>+91 6388908096</p>
+              <p style={{ fontSize: '9px', fontWeight: '800', color: '#64748b', margin: 0 }}>{user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '+91 6388908096'}</p>
             </div>
           </div>
         </div>
@@ -987,18 +1020,18 @@ const QuotationViewPage = () => {
         {/* PAGE 7: FINANCING (Only if required) */}
         {quotation.loanDetails?.required && (
           <div ref={el => pagesRef.current[6] = el} style={{ ...pageStyle, padding: '45px 30px' }}>
-            <TopRightTriangle />
-            <BottomLeftTriangle />
+            <TopRightTriangle themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} />
+            <BottomLeftTriangle themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} />
             
-            <LogoHeader logo={logoBase64} />
+            <LogoHeader logo={logoBase64} themeColor={primaryThemeColor} secondaryThemeColor={secondaryThemeColor} companyName={companyName} />
             
-            <h1 style={{ fontSize: '26px', fontWeight: '900', color: '#3f7abe', marginTop: '35px', marginBottom: '25px', position: 'relative', zIndex: 10, letterSpacing: '0.5px' }}>
+            <h1 style={{ fontSize: '26px', fontWeight: '900', color: primaryThemeColor, marginTop: '35px', marginBottom: '25px', position: 'relative', zIndex: 10, letterSpacing: '0.5px' }}>
               Financing & Loan Structure
             </h1>
             
             <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', gap: '20px', flex: 1, justifyContent: 'center' }}>
               <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '20px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                <h3 style={{ color: '#3f7abe', fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #f1f5f9', paddingBottom: '8px', marginBottom: '15px' }}>Bank Information</h3>
+                <h3 style={{ color: primaryThemeColor, fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #f1f5f9', paddingBottom: '8px', marginBottom: '15px' }}>Bank Information</h3>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
                   <div>
                     <p style={{ margin: 0, fontSize: '10px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>BANK NAME</p>
@@ -1014,16 +1047,16 @@ const QuotationViewPage = () => {
               <div style={{ display: 'flex', gap: '20px' }}>
                 <div style={{ flex: 1, backgroundColor: 'white', padding: '24px', borderRadius: '20px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
                   <p style={{ margin: 0, fontSize: '10px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>LOAN AMOUNT</p>
-                  <p style={{ margin: 0, fontSize: '24px', color: '#3f7abe', fontWeight: '900' }}>₹{quotation.loanDetails.loanAmount?.toLocaleString()}</p>
+                  <p style={{ margin: 0, fontSize: '24px', color: primaryThemeColor, fontWeight: '900' }}>₹{quotation.loanDetails.loanAmount?.toLocaleString()}</p>
                 </div>
                 <div style={{ flex: 1, backgroundColor: 'white', padding: '24px', borderRadius: '20px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
                   <p style={{ margin: 0, fontSize: '10px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase' }}>MONTHLY EMI</p>
-                  <p style={{ margin: 0, fontSize: '24px', color: '#3f7abe', fontWeight: '900' }}>₹{quotation.loanDetails.emiAmount?.toLocaleString()}</p>
+                  <p style={{ margin: 0, fontSize: '24px', color: primaryThemeColor, fontWeight: '900' }}>₹{quotation.loanDetails.emiAmount?.toLocaleString()}</p>
                 </div>
               </div>
 
               <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '20px', border: '1px solid #cbd5e1', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
-                <h3 style={{ color: '#3f7abe', fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #f1f5f9', paddingBottom: '8px', marginBottom: '15px' }}>Repayment Terms</h3>
+                <h3 style={{ color: primaryThemeColor, fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #f1f5f9', paddingBottom: '8px', marginBottom: '15px' }}>Repayment Terms</h3>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
                   <span style={{ fontSize: '13px', color: '#64748b', fontWeight: 'bold' }}>TENURE</span>
@@ -1045,7 +1078,7 @@ const QuotationViewPage = () => {
             </div>
 
             <div style={{ textAlign: 'center', zIndex: 10, marginTop: '20px', borderTop: '1px solid #cbd5e1', paddingTop: '10px' }}>
-              <span style={{ fontSize: '13px', color: '#3f7abe', fontWeight: '700', letterSpacing: '0.5px' }}>www.solarecogrid.com</span>
+              <span style={{ fontSize: '13px', color: primaryThemeColor, fontWeight: '700', letterSpacing: '0.5px' }}>{user?.companyDetails?.websiteUrl || 'www.solarhub.com'}</span>
             </div>
           </div>
         )}

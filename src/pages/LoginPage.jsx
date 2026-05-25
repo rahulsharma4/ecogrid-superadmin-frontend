@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 import logo from '../assets/Logo.jpeg';
 import { Mail, Lock, Loader2, ArrowRight, ShieldCheck, Zap, Eye, EyeOff } from 'lucide-react';
 
@@ -13,6 +14,173 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const [branding, setBranding] = useState({
+    companyName: 'Solar Hub',
+    companyLogo: '',
+    themeColor: '#3f7abe',
+    themeColorSecondary: '#f6871e',
+    companyTagline: '',
+    companyDescription: ''
+  });
+
+  const checkBranding = async (emailVal) => {
+    if (!emailVal || !emailVal.includes('@') || emailVal.length < 5) return;
+    try {
+      const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/company-by-email?email=${emailVal}`);
+      if (data && data.companyName) {
+        setBranding({
+          companyName: data.companyName,
+          companyLogo: data.companyLogo || '',
+          themeColor: data.themeColor || '#3f7abe',
+          themeColorSecondary: data.themeColorSecondary || '#f6871e',
+          companyTagline: data.companyTagline || '',
+          companyDescription: data.companyDescription || ''
+        });
+      }
+    } catch (err) {
+      // Keep fallback branding intact
+    }
+  };
+
+  useEffect(() => {
+    // Dynamic favicon logic
+    const faviconLink = document.querySelector("link[rel*='icon']");
+    if (faviconLink) {
+      faviconLink.href = branding.companyLogo || logo;
+    }
+    // Dynamic document title logic
+    const companyName = branding.companyName || 'Solar Hub';
+    document.title = `${companyName} CRM | Command Center`;
+
+    const style = document.createElement('style');
+    style.id = 'dynamic-login-theme';
+    style.innerHTML = `
+      :root {
+        --color-primary: ${branding.themeColor} !important;
+        --color-secondary: ${branding.themeColorSecondary} !important;
+        --login-primary: ${branding.themeColor};
+        --login-secondary: ${branding.themeColorSecondary};
+      }
+      
+      /* Global elements overrides */
+      .btn-primary:hover {
+        background-color: color-mix(in srgb, var(--color-primary) 85%, black) !important;
+        box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--color-primary) 30%, transparent) !important;
+      }
+      .btn-secondary:hover {
+        background-color: color-mix(in srgb, var(--color-secondary) 85%, black) !important;
+        box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--color-secondary) 30%, transparent) !important;
+      }
+      .input-field:focus {
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+      }
+
+      /* Tailwind arbitrary class overrides for primary (#3f7abe) */
+      .bg-\\[\\#3f7abe\\] {
+        background-color: var(--login-primary) !important;
+      }
+      .text-\\[\\#3f7abe\\] {
+        color: var(--login-primary) !important;
+      }
+      .border-\\[\\#3f7abe\\] {
+        border-color: var(--login-primary) !important;
+      }
+      .focus\\:border-\\[\\#3f7abe\\]:focus {
+        border-color: var(--login-primary) !important;
+      }
+      .hover\\:bg-\\[\\#33629c\\]:hover {
+        background-color: color-mix(in srgb, var(--login-primary) 85%, black) !important;
+      }
+      .bg-\\[\\#33629c\\] {
+        background-color: color-mix(in srgb, var(--login-primary) 85%, black) !important;
+      }
+
+      /* Primary shadow overrides */
+      .shadow-\\[\\#3f7abe\\]\\/20 {
+        --tw-shadow-color: color-mix(in srgb, var(--login-primary) 20%, transparent) !important;
+      }
+      .shadow-\\[\\#3f7abe\\]\\/25 {
+        --tw-shadow-color: color-mix(in srgb, var(--login-primary) 25%, transparent) !important;
+      }
+      .shadow-xl {
+        box-shadow: 0 20px 25px -5px color-mix(in srgb, var(--login-primary) 10%, transparent), 0 8px 10px -6px color-mix(in srgb, var(--login-primary) 10%, transparent) !important;
+      }
+
+      /* Primary opacity backgrounds / borders */
+      .bg-\\[\\#3f7abe\\]\\/5 {
+        background-color: color-mix(in srgb, var(--login-primary) 5%, transparent) !important;
+      }
+      .bg-\\[\\#3f7abe\\]\\/10 {
+        background-color: color-mix(in srgb, var(--login-primary) 10%, transparent) !important;
+      }
+      .border-\\[\\#3f7abe\\]\\/10 {
+        border-color: color-mix(in srgb, var(--login-primary) 10%, transparent) !important;
+      }
+
+      /* Tailwind arbitrary class overrides for secondary (#f6871e) */
+      .bg-\\[\\#f6871e\\] {
+        background-color: var(--login-secondary) !important;
+      }
+      .text-\\[\\#f6871e\\] {
+        color: var(--login-secondary) !important;
+      }
+      .border-\\[\\#f6871e\\] {
+        border-color: var(--login-secondary) !important;
+      }
+      .focus\\:border-\\[\\#f6871e\\]:focus {
+        border-color: var(--login-secondary) !important;
+      }
+      .hover\\:bg-\\[\\#e0761a\\]:hover {
+        background-color: color-mix(in srgb, var(--login-secondary) 85%, black) !important;
+      }
+      .bg-\\[\\#e0761a\\] {
+        background-color: color-mix(in srgb, var(--login-secondary) 85%, black) !important;
+      }
+
+      /* Top line dynamic gradient stops */
+      .from-\\[\\#3f7abe\\] {
+        --tw-gradient-from: var(--login-primary) !important;
+        --tw-gradient-to: color-mix(in srgb, var(--login-primary) 0%, transparent) !important;
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+      }
+      .via-\\[\\#f6871e\\] {
+        --tw-gradient-to: color-mix(in srgb, var(--login-secondary) 0%, transparent) !important;
+        --tw-gradient-stops: var(--tw-gradient-from), var(--login-secondary), var(--tw-gradient-to) !important;
+      }
+      .to-\\[\\#3f7abe\\] {
+        --tw-gradient-to: var(--login-primary) !important;
+      }
+
+      /* Secondary shadow overrides */
+      .shadow-\\[\\#f6871e\\]\\/20 {
+        --tw-shadow-color: color-mix(in srgb, var(--login-secondary) 20%, transparent) !important;
+      }
+
+      /* Secondary opacity backgrounds / borders */
+      .bg-\\[\\#f6871e\\]\\/5 {
+        background-color: color-mix(in srgb, var(--login-secondary) 5%, transparent) !important;
+      }
+      .bg-\\[\\#f6871e\\]\\/10 {
+        background-color: color-mix(in srgb, var(--login-secondary) 10%, transparent) !important;
+      }
+      .border-\\[\\#f6871e\\]\\/10 {
+        border-color: color-mix(in srgb, var(--login-secondary) 10%, transparent) !important;
+      }
+    `;
+    const existing = document.getElementById('dynamic-login-theme');
+    if (existing) existing.remove();
+    document.head.appendChild(style);
+    return () => {
+      style.remove();
+    };
+  }, [branding.themeColor, branding.themeColorSecondary]);
+
+  const handleEmailChange = (e) => {
+    const val = e.target.value;
+    setEmail(val);
+    checkBranding(val);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,13 +215,17 @@ const LoginPage = () => {
            
            <div className="relative z-10">
               <div className="bg-white p-4 rounded-2xl inline-block shadow-xl">
-                 <img src={logo} alt="Logo" className="h-12 w-auto" />
+                 <img src={branding.companyLogo || logo} alt="Logo" className="h-12 w-auto object-contain max-h-[48px]" />
               </div>
               <h1 className="text-5xl font-black text-white mt-8 tracking-tighter leading-tight">
-                 Powering the<br/><span className="text-[#f6871e]">Solar Revolution.</span>
+                 {branding.companyTagline || (
+                   <>
+                     Powering the<br/><span className="text-[#f6871e]">Solar Revolution.</span>
+                   </>
+                 )}
               </h1>
               <p className="text-white/70 text-lg mt-6 font-medium max-w-sm">
-                 Access the EcoGrid Command Center to manage your sustainable energy infrastructure.
+                 {branding.companyDescription || `Access the ${branding.companyName} Command Center to manage your sustainable energy infrastructure.`}
               </p>
            </div>
 
@@ -73,9 +245,9 @@ const LoginPage = () => {
         {/* Right Side: Form */}
         <div className="flex-1 p-8 lg:p-16 flex flex-col justify-center bg-white">
           <div className="lg:hidden flex justify-center mb-8">
-             <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 shadow-sm">
-                <img src={logo} alt="Logo" className="h-10 w-auto" />
-             </div>
+              <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100 shadow-sm">
+                 <img src={branding.companyLogo || logo} alt="Logo" className="h-10 w-auto object-contain max-h-[40px] rounded" />
+              </div>
           </div>
 
           <div className="max-w-md mx-auto w-full">
@@ -103,7 +275,7 @@ const LoginPage = () => {
                     type="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                     placeholder="name@company.com"
                     className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none focus:bg-white focus:border-[#3f7abe] transition-all font-medium text-slate-900 group-hover:bg-slate-100/50"
                   />

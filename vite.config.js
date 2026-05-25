@@ -13,9 +13,9 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['favicon.svg', 'logo192.jpeg', 'logo512.jpeg'],
       manifest: {
-        short_name: "EcoGrid",
-        name: "EcoGrid CRM Command Center",
-        description: "Enterprise CRM and Project Command Center for EcoGrid Infra",
+        short_name: "Solar Hub",
+        name: "Solar Hub CRM Command Center",
+        description: "Enterprise CRM and Project Command Center for Solar Hub",
         theme_color: "#3f7abe",
         background_color: "#f8fafc",
         display: "standalone",

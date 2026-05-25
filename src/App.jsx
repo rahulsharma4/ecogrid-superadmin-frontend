@@ -19,6 +19,7 @@ import FormalInvoicePage from './pages/FormalInvoicePage';
 import ConsultantDetailPage from './pages/ConsultantDetailPage';
 import ContactsPage from './pages/ContactsPage';
 import ContactDetailPage from './pages/ContactDetailPage';
+import CompanySettingsPage from './pages/CompanySettingsPage';
 
 // Super Admin Pages
 import SuperAdminAdminsPage from './pages/superadmin/SuperAdminAdminsPage';
@@ -95,6 +96,7 @@ function App() {
                     <Route path="invoices/view/:id" element={<FormalInvoicePage />} />
                     <Route path="staff" element={<AdminRoute><ConsultantsPage /></AdminRoute>} />
                     <Route path="staff/:id" element={<AdminRoute><ConsultantDetailPage /></AdminRoute>} />
+                    <Route path="company-settings" element={<AdminRoute><CompanySettingsPage /></AdminRoute>} />
                     <Route path="contacts" element={<ContactsPage />} />
                     <Route path="contacts/:id" element={<ContactDetailPage />} />
                     <Route path="payments" element={<PaymentsPage />} />

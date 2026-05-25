@@ -36,6 +36,9 @@ const DashboardStats = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const primaryColor = user?.companyDetails?.themeColor || '#3f7abe';
+  const secondaryColor = user?.companyDetails?.themeColorSecondary || '#f6871e';
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -108,7 +111,7 @@ const DashboardStats = () => {
         <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex justify-between items-center">
           <div>
             <h1 className="text-xl font-black text-slate-900 tracking-tight uppercase">Super Admin Command Center</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">EcoGrid Infrastructure Global Monitor</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Solar Infrastructure Global Monitor</p>
           </div>
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 animate-pulse">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
@@ -215,7 +218,7 @@ const DashboardStats = () => {
                             dataKey="value"
                          >
                             {(data?.statusDistribution || []).map((entry, index) => (
-                               <Cell key={`cell-${index}`} fill={['#3f7abe', '#f6871e', '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6]} />
+                               <Cell key={`cell-${index}`} fill={[primaryColor, secondaryColor, '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6]} />
                             ))}
                          </Pie>
                          <Tooltip 
@@ -234,7 +237,7 @@ const DashboardStats = () => {
                    {(data?.statusDistribution || []).map((entry, index) => (
                       <div key={index} className="flex items-center justify-between text-[8px] font-black">
                          <div className="flex items-center gap-1.5 min-w-0">
-                            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: ['#3f7abe', '#f6871e', '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6] }}></div>
+                            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: [primaryColor, secondaryColor, '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6] }}></div>
                             <span className="text-slate-500 uppercase truncate">{entry.name}</span>
                          </div>
                          <span className="text-slate-900">{entry.value}</span>
@@ -290,8 +293,11 @@ const DashboardStats = () => {
                       {/* Visual bar */}
                       <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                          <div 
-                           className="h-full bg-gradient-to-r from-[#3f7abe] to-[#f6871e] rounded-full" 
-                           style={{ width: `${Math.min(100, Math.max(10, (adm.revenue / (data.totalRevenue || 1)) * 100))}%` }}
+                           className="h-full rounded-full" 
+                           style={{ 
+                             width: `${Math.min(100, Math.max(10, (adm.revenue / (data.totalRevenue || 1)) * 100))}%`,
+                             background: `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`
+                           }}
                          ></div>
                       </div>
                     </div>
@@ -425,7 +431,7 @@ const DashboardStats = () => {
                           dataKey="value"
                        >
                           {(data?.contactStatusDistribution || []).map((entry, index) => (
-                             <Cell key={`cell-${index}`} fill={['#3f7abe', '#f6871e', '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6]} />
+                             <Cell key={`cell-${index}`} fill={[primaryColor, secondaryColor, '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6]} />
                           ))}
                        </Pie>
                        <Tooltip 
@@ -444,7 +450,7 @@ const DashboardStats = () => {
                   {(data?.contactStatusDistribution || []).map((entry, index) => (
                      <div key={index} className="flex items-center justify-between text-[8px] font-black">
                         <div className="flex items-center gap-1.5 min-w-0">
-                           <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: ['#3f7abe', '#f6871e', '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6] }}></div>
+                           <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: [primaryColor, secondaryColor, '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6] }}></div>
                            <span className="text-slate-500 uppercase truncate">{entry.name}</span>
                         </div>
                         <span className="text-slate-900">{entry.value}</span>
@@ -630,9 +636,9 @@ const DashboardStats = () => {
                           paddingAngle={5}
                           dataKey="value"
                        >
-                          {(data?.statusDistribution || []).map((entry, index) => (
-                             <Cell key={`cell-${index}`} fill={['#3f7abe', '#f6871e', '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6]} />
-                          ))}
+                           {(data?.statusDistribution || []).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={[primaryColor, secondaryColor, '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6]} />
+                           ))}
                        </Pie>
                        <Tooltip 
                           contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 5px 15px rgba(0,0,0,0.1)', padding: '8px'}}
@@ -650,7 +656,7 @@ const DashboardStats = () => {
                  {(data?.statusDistribution || []).map((entry, index) => (
                     <div key={index} className="flex items-center justify-between text-[8px] font-black">
                        <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: ['#3f7abe', '#f6871e', '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6] }}></div>
+                           <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: [primaryColor, secondaryColor, '#10b981', '#7c3aed', '#ec4899', '#6366f1'][index % 6] }}></div>
                           <span className="text-slate-500 uppercase truncate">{entry.name}</span>
                        </div>
                        <span className="text-slate-900">{entry.value}</span>
