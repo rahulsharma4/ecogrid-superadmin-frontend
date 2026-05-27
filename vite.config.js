@@ -43,7 +43,8 @@ export default defineConfig({
       workbox: {
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpeg,jpg,json}'],
-        navigateFallback: '/index.html'
+        navigateFallback: '/index.html',
+        maximumFileSizeToCacheInBytes: 5000000
       }
     })
   ]
