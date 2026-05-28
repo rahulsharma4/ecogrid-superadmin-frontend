@@ -125,3 +125,97 @@
     border-radius: 1.25rem;
   }
 }
+
+/* Dynamic Color Utility Overrides */
+.text-\[\#3f7abe\] {
+  color: var(--color-primary) !important;
+}
+.bg-\[\#3f7abe\] {
+  background-color: var(--color-primary) !important;
+}
+.border-\[\#3f7abe\] {
+  border-color: var(--color-primary) !important;
+}
+/* hovers */
+.hover\:text-\[\#3f7abe\]:hover {
+  color: var(--color-primary) !important;
+}
+.hover\:bg-\[\#3f7abe\]:hover {
+  background-color: var(--color-primary) !important;
+}
+.hover\:border-\[\#3f7abe\]:hover {
+  border-color: var(--color-primary) !important;
+}
+/* group hovers */
+.group:hover .group-hover\:text-\[\#3f7abe\] {
+  color: var(--color-primary) !important;
+}
+.group:hover .group-hover\:bg-\[\#3f7abe\] {
+  background-color: var(--color-primary) !important;
+}
+.group:hover .group-hover\:text-white {
+  color: #ffffff !important;
+}
+/* opacity variants */
+.bg-\[\#3f7abe\]\/5 {
+  background-color: color-mix(in srgb, var(--color-primary) 5%, transparent) !important;
+}
+.bg-\[\#3f7abe\]\/10 {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+}
+.bg-\[\#3f7abe\]\/20 {
+  background-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+.border-\[\#3f7abe\]\/10 {
+  border-color: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+}
+.border-\[\#3f7abe\]\/20 {
+  border-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+.hover\:border-\[\#3f7abe\]\/20:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+
+/* Secondary Colors */
+.text-\[\#f6871e\] {
+  color: var(--color-secondary) !important;
+}
+.bg-\[\#f6871e\] {
+  background-color: var(--color-secondary) !important;
+}
+.border-\[\#f6871e\] {
+  border-color: var(--color-secondary) !important;
+}
+.hover\:text-\[\#f6871e\]:hover {
+  color: var(--color-secondary) !important;
+}
+.hover\:bg-\[\#f6871e\]:hover {
+  background-color: var(--color-secondary) !important;
+}
+.hover\:border-\[\#f6871e\]:hover {
+  border-color: var(--color-secondary) !important;
+}
+.group:hover .group-hover\:text-\[\#f6871e\] {
+  color: var(--color-secondary) !important;
+}
+.group:hover .group-hover\:bg-\[\#f6871e\] {
+  background-color: var(--color-secondary) !important;
+}
+.bg-\[\#f6871e\]\/5 {
+  background-color: color-mix(in srgb, var(--color-secondary) 5%, transparent) !important;
+}
+.bg-\[\#f6871e\]\/10 {
+  background-color: color-mix(in srgb, var(--color-secondary) 10%, transparent) !important;
+}
+.bg-\[\#f6871e\]\/20 {
+  background-color: color-mix(in srgb, var(--color-secondary) 20%, transparent) !important;
+}
+.border-\[\#f6871e\]\/10 {
+  border-color: color-mix(in srgb, var(--color-secondary) 10%, transparent) !important;
+}
+.border-\[\#f6871e\]\/20 {
+  border-color: color-mix(in srgb, var(--color-secondary) 20%, transparent) !important;
+}
+.hover\:border-\[\#f6871e\]\/20:hover {
+  border-color: color-mix(in srgb, var(--color-secondary) 20%, transparent) !important;
+}
