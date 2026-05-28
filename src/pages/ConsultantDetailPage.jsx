@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 import { 
   User, 
   Mail, 
@@ -16,7 +17,10 @@ import {
   Activity,
   Search,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  X,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 const statusColors = {
@@ -42,6 +46,64 @@ const ConsultantDetailPage = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Edit Staff State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: 'staff',
+    status: 'active',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const openEditModal = () => {
+    if (!data?.staff) return;
+    setEditForm({
+      name: data.staff.name || '',
+      email: data.staff.email || '',
+      phone: data.staff.phone || '',
+      role: data.staff.role || 'staff',
+      status: data.staff.status || 'active',
+      password: ''
+    });
+    setShowPassword(false);
+    setShowEditModal(true);
+  };
+
+  const handleEditInputChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const loadingToast = toast.loading('Updating consultant credentials...');
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const payload = { ...editForm };
+      if (!payload.password) {
+        delete payload.password;
+      }
+      const { data: updatedStaff } = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/staff/${id}`,
+        payload,
+        config
+      );
+      toast.success('Credentials Updated Successfully!', { id: loadingToast });
+      setShowEditModal(false);
+      setData(prev => ({ ...prev, staff: updatedStaff }));
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message;
+      toast.error('Failed to update: ' + msg, { id: loadingToast });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -102,17 +164,26 @@ const ConsultantDetailPage = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       {/* Header & Back Navigation */}
-      <div className="flex items-center gap-4">
-        <button 
-          onClick={() => navigate(-1)}
-          className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 hover:bg-slate-50 transition-all active:scale-95 group"
-        >
-          <ChevronLeft className="w-6 h-6 text-slate-600 group-hover:-translate-x-1 transition-transform" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Consultant Dossier</h1>
-          <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Consultant: {staff.name}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate(-1)}
+            className="p-3 bg-white rounded-2xl shadow-sm border border-slate-100 hover:bg-slate-50 transition-all active:scale-95 group"
+          >
+            <ChevronLeft className="w-6 h-6 text-slate-600 group-hover:-translate-x-1 transition-transform" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Consultant Dossier</h1>
+            <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">Consultant: {staff.name}</p>
+          </div>
         </div>
+        <button 
+          onClick={openEditModal}
+          className="btn-secondary self-start sm:self-center"
+        >
+          <User className="w-5 h-5" />
+          Edit Credentials
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -268,6 +339,92 @@ const ConsultantDetailPage = () => {
            </div>
         </div>
       </div>
+
+      {showEditModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-6 overflow-y-auto">
+          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-xl overflow-hidden my-auto animate-in zoom-in-95 duration-300">
+            <div className="p-8 border-b border-slate-100 bg-[#3f7abe]/5 flex items-center justify-between">
+               <div>
+                  <h2 className="text-2xl font-black text-[#3f7abe]">Edit Credentials</h2>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Update staff profiles</p>
+               </div>
+               <button onClick={() => { setShowEditModal(false); setShowPassword(false); }} className="p-2 hover:bg-slate-50 rounded-lg transition-all text-slate-500">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleEditSubmit} className="p-8 space-y-6">
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Full Name *</label>
+                  <input type="text" name="name" required value={editForm.name} onChange={handleEditInputChange} className="input-field" />
+                </div>
+                <div className="space-y-2">
+                   <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Email *</label>
+                   <input type="email" name="email" required value={editForm.email} onChange={handleEditInputChange} className="input-field" />
+                </div>
+                <div className="space-y-2">
+                   <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Phone *</label>
+                   <input type="text" name="phone" required value={editForm.phone} onChange={handleEditInputChange} className="input-field" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Role *</label>
+                    <select 
+                      name="role" 
+                      required 
+                      value={editForm.role} 
+                      onChange={handleEditInputChange} 
+                      className="input-field bg-white"
+                    >
+                      <option value="staff">Consultant</option>
+                      <option value="telecaller">Telecaller Executive</option>
+                    </select>
+                 </div>
+                <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Status *</label>
+                    <select 
+                      name="status" 
+                      required 
+                      value={editForm.status} 
+                      onChange={handleEditInputChange} 
+                      className="input-field bg-white"
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                 </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Reset Password (Leave blank to keep unchanged)</label>
+                  <div className="relative group">
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      name="password" 
+                      value={editForm.password} 
+                      onChange={handleEditInputChange} 
+                      className="input-field pr-12" 
+                      placeholder="Enter new password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-[#3f7abe] transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4.5 h-4.5" /> : <Eye className="w-4.5 h-4.5" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button type="button" onClick={() => { setShowEditModal(false); setShowPassword(false); }} className="flex-1 p-4 bg-slate-50 text-slate-600 rounded-2xl font-black uppercase text-[10px] tracking-widest">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="btn-primary flex-[2] p-4 justify-center rounded-2xl text-[10px] uppercase tracking-widest shadow-lg shadow-[#3f7abe]/20">
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Confirm Edit'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

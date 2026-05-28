@@ -904,116 +904,196 @@ const QuotationViewPage = () => {
         </div>
 
         {/* PAGE 6: CONTACT US / BACK COVER */}
-        <div ref={el => pagesRef.current[5] = el} style={{ ...pageStyle, padding: 0, justifyContent: 'space-between', display: 'flex', flexDirection: 'column' }}>
-          {/* Top Half: Solar panels photo */}
-          <div style={{ width: '100%', height: '35%', position: 'relative', overflow: 'hidden' }}>
-            {imagesBase64.roof2 ? (
-              <img src={imagesBase64.roof2} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Solar panels backdrop" />
-            ) : (
-              imagesBase64.roof1 && <img src={imagesBase64.roof1} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Solar panels backdrop" />
-            )}
-          </div>
-
-          {/* Middle: Title cards */}
-          <div style={{ padding: '0 30px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+        <div ref={el => pagesRef.current[5] = el} style={{ ...pageStyle, padding: '45px 30px', justifyContent: 'space-between', display: 'flex', flexDirection: 'column' }}>
+          
+          {/* Header Row */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', position: 'relative', zIndex: 10, textAlign: 'center' }}>
             <span style={{ fontSize: '11px', fontWeight: '900', color: '#64748b', letterSpacing: '2px', textTransform: 'uppercase' }}>CONTACT US</span>
-            <h1 style={{ fontSize: '32px', fontWeight: '900', color: primaryThemeColor, margin: 0, textAlign: 'center', letterSpacing: '0.5px', lineHeight: '1.2' }}>
+            <h1 style={{ fontSize: '32px', fontWeight: '900', color: primaryThemeColor, margin: 0, letterSpacing: '0.5px', lineHeight: '1.2' }}>
               {companyName.toUpperCase()}
             </h1>
-
-            {/* Logo Container */}
-            <div style={{ background: '#ffffff', borderRadius: '30px', padding: '10px 28px', display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid #cbd5e1', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginTop: '5px' }}>
-              {logoBase64 && <img src={logoBase64} alt="Logo" style={{ height: '35px', width: '35px', borderRadius: '50%', objectFit: 'cover' }} />}
-              <span style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '0.5px' }}>
+            
+            {/* Pill Logo Container */}
+            <div style={{ background: '#ffffff', borderRadius: '30px', padding: '6px 20px', display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #cbd5e1', boxShadow: '0 4px 10px rgba(0,0,0,0.03)', marginTop: '2px' }}>
+              {logoBase64 && <img src={logoBase64} alt="Logo" style={{ height: '30px', width: '30px', borderRadius: '50%', objectFit: 'cover' }} />}
+              <span style={{ fontSize: '15px', fontWeight: '900', letterSpacing: '0.5px' }}>
                 <span style={{ color: primaryThemeColor }}>{firstPartCover.toUpperCase()} </span>
                 {secondPartCover && <span style={{ color: secondaryThemeColor }}>{secondPartCover.toUpperCase()}</span>}
               </span>
             </div>
           </div>
 
-          {/* Bottom Card Block: Contact Details & WhatsApp QR Side-by-Side */}
+          {/* Orange Card Container */}
           <div style={{
+            background: secondaryThemeColor,
+            color: 'white',
+            borderRadius: '24px',
+            padding: '24px 20px',
+            boxShadow: `0 8px 25px ${secondaryThemeColor}30`,
             display: 'flex',
-            gap: '20px',
-            margin: '0 25px 25px 25px',
-            alignItems: 'stretch'
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '15px',
+            position: 'relative',
+            zIndex: 10
           }}>
-            {/* Left Column: Custom Theme Accent card */}
-            <div style={{
-              flex: '1.4',
-              background: secondaryThemeColor,
-              color: 'white',
-              borderRadius: '24px',
-              padding: '24px 20px',
-              boxShadow: `0 8px 25px ${secondaryThemeColor}40`,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '14px'
-            }}>
-              {/* Phone Info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.2)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Phone size={16} color="white" />
+            {/* Left part: Grid of contact details */}
+            <div style={{ flex: '1.4', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              
+              {/* Row 1: Phone and Website */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
+                {/* Phone */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '50%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.2)', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Phone size={14} color="white" />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', opacity: 0.8, letterSpacing: '0.5px' }}>Phone</span>
+                    <span style={{ fontSize: '12px', fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.companyDetails?.supportPhone || '+91 9889555339'}</span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 'bold' }}>{user?.companyDetails?.supportPhone || '+91 9999999999'}</span>
+                
+                {/* Website */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '50%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.2)', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Globe size={14} color="white" />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', opacity: 0.8, letterSpacing: '0.5px' }}>Website</span>
+                    <span style={{ fontSize: '12px', fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.companyDetails?.websiteUrl || 'www.solarecogrid.in'}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Website Info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.2)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Globe size={16} color="white" />
+              {/* Row 2: Email and Address */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
+                {/* Email */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '50%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.2)', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Mail size={14} color="white" />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', opacity: 0.8, letterSpacing: '0.5px' }}>Email</span>
+                    <span style={{ fontSize: '12px', fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.companyDetails?.supportEmail || 'info@ecogridinfra.in'}</span>
+                  </div>
                 </div>
-                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>{user?.companyDetails?.websiteUrl || 'www.solarhub.com'}</span>
+
+                {/* Address */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', width: '50%' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.2)', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                    <MapPin size={14} color="white" />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', opacity: 0.8, letterSpacing: '0.5px' }}>Address</span>
+                    <span style={{ fontSize: '10px', fontWeight: 'bold', lineHeight: '1.3' }}>{user?.companyDetails?.companyAddress || 'D-352, Vibhuti khand, Gomti Nagar Lucknow, 226010'}</span>
+                  </div>
+                </div>
               </div>
 
-              {/* Email Info */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.2)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Mail size={16} color="white" />
-                </div>
-                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>{user?.companyDetails?.supportEmail || 'support@solarhub.com'}</span>
-              </div>
-
-              {/* Address Info */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-                <div style={{ background: 'rgba(255,255,255,0.2)', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2px', flexShrink: 0 }}>
-                  <MapPin size={16} color="white" />
-                </div>
-                <span style={{ fontSize: '12px', fontWeight: 'bold', lineHeight: '1.4' }}>
-                  {user?.companyDetails?.companyAddress || 'D-352, Vibhuti khand, Gomti Nagar Lucknow, 226010'}
+              {/* GSTIN badge */}
+              <div style={{ marginTop: '5px' }}>
+                <span style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '10px', padding: '5px 12px', fontSize: '10px', fontWeight: '900', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                  GSTIN: {user?.companyDetails?.gstNumber || '09AAJCE0630Q1ZA'}
                 </span>
               </div>
             </div>
 
-            {/* Right Column: WhatsApp QR Card */}
+            {/* Right part: Scan to Chat QR card */}
             <div style={{
-              flex: '1',
-              background: '#ffffff',
-              borderRadius: '24px',
-              padding: '20px',
-              border: '2px solid #f1f5f9',
-              boxShadow: '0 8px 25px rgba(0,0,0,0.03)',
+              flex: '0.85',
+              background: 'rgba(255,255,255,0.15)',
+              borderRadius: '20px',
+              padding: '16px 12px',
+              border: '1px solid rgba(255,255,255,0.25)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '10px',
+              gap: '8px',
               textAlign: 'center'
             }}>
-              <p style={{ fontSize: '10px', fontWeight: '900', color: '#16a34a', textTransform: 'uppercase', margin: 0, letterSpacing: '0.05em' }}>Scan to Chat</p>
-              <div style={{ background: '#dcfce7', borderRadius: '12px', padding: '6px 12px', fontSize: '9px', fontWeight: '800', color: '#166534', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Zap size={10} fill="#16a34a" color="#16a34a" /> WhatsApp Contact
-              </div>
+              <p style={{ fontSize: '9px', fontWeight: '900', color: '#ffffff', textTransform: 'uppercase', margin: 0, letterSpacing: '0.05em' }}>Scan to Chat</p>
               <img 
                 src={user?.companyDetails?.whatsappQrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://wa.me/' + ((user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '916388908096').replace(/[^0-9]/g, '')))}`}
                 alt="WhatsApp QR Code" 
-                style={{ width: '105px', height: '105px', display: 'block', borderRadius: '8px', objectFit: 'contain' }} 
+                style={{ width: '90px', height: '90px', display: 'block', borderRadius: '8px', objectFit: 'contain', background: '#ffffff', padding: '4px' }} 
               />
-              <p style={{ fontSize: '9px', fontWeight: '800', color: '#64748b', margin: 0 }}>{user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '+91 6388908096'}</p>
+              <p style={{ fontSize: '8px', fontWeight: '900', color: '#ffffff', margin: 0 }}>{user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '+91 6388908096'}</p>
             </div>
+          </div>
+
+          {/* Bank Remittance Container Card */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '24px',
+            padding: '24px 20px',
+            border: '2px solid #f1f5f9',
+            boxShadow: '0 8px 25px rgba(0,0,0,0.02)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '15px',
+            position: 'relative',
+            zIndex: 10
+          }}>
+            {/* Left part: Bank Account Details */}
+            <div style={{ flex: '1.4', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <span style={{ fontSize: '12px', fontWeight: '900', color: primaryThemeColor, letterSpacing: '1px', textTransform: 'uppercase' }}>Bank Remittance</span>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Account Name</span>
+                  <p style={{ margin: 0, fontSize: '11px', fontWeight: '800', color: '#334155', textTransform: 'uppercase' }}>{user?.companyDetails?.payeeName || 'ECOGRID INFRA PRIVATE LIMITED'}</p>
+                </div>
+                <div>
+                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Bank Name</span>
+                  <p style={{ margin: 0, fontSize: '11px', fontWeight: '800', color: '#334155' }}>{user?.companyDetails?.bankName || 'Punjab National Bank'}</p>
+                </div>
+                <div>
+                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Account Number (Current)</span>
+                  <p style={{ margin: 0, fontSize: '12px', fontWeight: '900', color: primaryThemeColor }}>{user?.companyDetails?.bankAccountNo || '6193002100004183'}</p>
+                </div>
+                <div>
+                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>IFSC Code</span>
+                  <p style={{ margin: 0, fontSize: '12px', fontWeight: '900', color: '#334155' }}>{user?.companyDetails?.bankIfsc || 'PUNB0619300'}</p>
+                </div>
+              </div>
+              
+              <div>
+                <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Branch</span>
+                <p style={{ margin: 0, fontSize: '10px', fontWeight: '800', color: '#475569' }}>
+                  {user?.companyDetails?.bankBranch || 'Vibhuti Khand, Gomti Nagar, Lucknow'}
+                </p>
+              </div>
+            </div>
+
+            {/* Right part: Scan to Pay QR card */}
+            <div style={{
+              flex: '0.85',
+              background: '#ffffff',
+              borderRadius: '20px',
+              padding: '16px 12px',
+              border: '1px solid #cbd5e1',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              textAlign: 'center'
+            }}>
+              <p style={{ fontSize: '9px', fontWeight: '900', color: primaryThemeColor, textTransform: 'uppercase', margin: 0, letterSpacing: '0.05em' }}>Scan to Pay</p>
+              <img 
+                src={user?.companyDetails?.paymentQrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('upi://pay?pa=' + (user?.companyDetails?.upiId || '6193002100004183@pnb') + '&pn=' + (user?.companyDetails?.payeeName || 'ECOGRID INFRA PRIVATE LIMITED') + '&cu=INR')}`}
+                alt="Payment QR Code" 
+                style={{ width: '90px', height: '90px', display: 'block', borderRadius: '8px', objectFit: 'contain' }} 
+              />
+              <p style={{ fontSize: '8px', fontWeight: '900', color: '#64748b', margin: 0, wordBreak: 'break-all', maxWidth: '100px' }}>{user?.companyDetails?.upiId || '6193002100004183@pnb'}</p>
+            </div>
+          </div>
+          
+          {/* Footer Website Address */}
+          <div style={{ textAlign: 'center', zIndex: 10, borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+            <span style={{ fontSize: '13px', color: primaryThemeColor, fontWeight: '700', letterSpacing: '0.5px' }}>{user?.companyDetails?.websiteUrl || 'www.solarecogrid.in'}</span>
           </div>
         </div>
 

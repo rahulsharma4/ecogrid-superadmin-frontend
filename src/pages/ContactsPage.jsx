@@ -221,35 +221,79 @@ const ContactsPage = () => {
           return;
         }
 
-        // Get headers and convert to lowercase
-        const headers = rawData[0].map(h => String(h).trim().toLowerCase());
-        const nameIdx = headers.indexOf('name');
-        const phoneIdx = headers.indexOf('phone');
-        const addressIdx = headers.indexOf('address');
-        const remarksIdx = headers.indexOf('remarks');
+        // Get headers and convert to lowercase for matching
+        const rawHeaders = rawData[0];
+        const headers = rawHeaders.map(h => String(h || '').trim());
+        const headersLower = headers.map(h => h.toLowerCase());
 
-        if (nameIdx === -1 || phoneIdx === -1 || addressIdx === -1) {
-          toast.error('File must contain "Name", "Phone", and "Address" columns');
-          return;
-        }
+        const findBestIndex = (keywords) => {
+          return headersLower.findIndex(h => keywords.some(k => h.includes(k)));
+        };
+
+        // Match columns dynamically
+        const nameIdx = findBestIndex(['full name', 'fullname', 'name', 'customer', 'client', 'person', 'naam', 'username', 'user']);
+        const phoneIdx = findBestIndex(['phone', 'mobile', 'number', 'tel', 'contact no', 'contact number', 'mobile no', 'mobile number', 'whatsapp', 'call']);
+        const addressIdx = findBestIndex(['address', 'addr', 'location', 'city', 'state', 'pincode', 'zip', 'street', 'pata', 'site']);
+        const remarksIdx = findBestIndex(['remarks', 'remark', 'comment', 'note', 'notes', 'details', 'info']);
 
         const parsedRows = [];
         for (let i = 1; i < rawData.length; i++) {
           const row = rawData[i];
-          if (row.length === 0) continue;
+          if (!row || row.length === 0) continue;
 
-          const name = row[nameIdx] ? String(row[nameIdx]).trim() : '';
-          const phone = row[phoneIdx] ? String(row[phoneIdx]).trim() : '';
-          const address = row[addressIdx] ? String(row[addressIdx]).trim() : '';
-          const remarks = remarksIdx !== -1 && row[remarksIdx] ? String(row[remarksIdx]).trim() : '';
+          // Check if the row has any data at all
+          const hasData = row.some(cell => cell !== null && cell !== undefined && String(cell).trim() !== '');
+          if (!hasData) continue;
 
-          if (name && phone) {
-            parsedRows.push({ name, phone, address, remarks });
+          // Extract basic fields with smart fallbacks
+          let name = nameIdx !== -1 && row[nameIdx] !== undefined && row[nameIdx] !== null ? String(row[nameIdx]).trim() : '';
+          let phone = phoneIdx !== -1 && row[phoneIdx] !== undefined && row[phoneIdx] !== null ? String(row[phoneIdx]).trim() : '';
+          let address = addressIdx !== -1 && row[addressIdx] !== undefined && row[addressIdx] !== null ? String(row[addressIdx]).trim() : '';
+          let initialRemarks = remarksIdx !== -1 && row[remarksIdx] !== undefined && row[remarksIdx] !== null ? String(row[remarksIdx]).trim() : '';
+
+          // Smart fallback defaults
+          if (!name && phone) {
+            name = `Contact ${phone}`;
+          } else if (!name) {
+            name = 'Unknown Contact';
           }
+
+          if (!phone) {
+            phone = 'N/A';
+          }
+
+          if (!address) {
+            address = 'N/A';
+          }
+
+          // Collect ALL other columns for this row to save in remarks
+          const otherDetails = [];
+          
+          if (initialRemarks) {
+            otherDetails.push(`Remarks: ${initialRemarks}`);
+          }
+
+          headers.forEach((hdr, idx) => {
+            if (idx !== nameIdx && idx !== phoneIdx && idx !== addressIdx && idx !== remarksIdx) {
+              const val = row[idx] !== null && row[idx] !== undefined ? String(row[idx]).trim() : '';
+              if (val) {
+                otherDetails.push(`${hdr}: ${val}`);
+              }
+            }
+          });
+
+          const finalRemarks = otherDetails.join(' | ');
+
+          parsedRows.push({
+            name,
+            phone,
+            address,
+            remarks: finalRemarks
+          });
         }
 
         if (parsedRows.length === 0) {
-          toast.error('No valid rows found (Name & Phone are required)');
+          toast.error('No valid rows found in the spreadsheet.');
         } else {
           setImportPreview(parsedRows);
           toast.success(`${parsedRows.length} contacts parsed successfully!`);
@@ -1170,7 +1214,8 @@ const ContactsPage = () => {
                   type="file" 
                   accept=".xlsx, .xls, .csv" 
                   onChange={handleFileChange} 
-                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
+                  onClick={(e) => { e.target.value = ''; }}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" 
                 />
                 <div className="p-4 bg-white rounded-2xl shadow-sm text-slate-400 group-hover:text-[#3f7abe] group-hover:scale-110 transition-all mb-3">
                   <FileSpreadsheet className="w-8 h-8" />
@@ -1207,12 +1252,12 @@ const ContactsPage = () => {
               </div>
 
               {/* Requirement Note */}
-              <div className="flex items-start gap-3 p-4 bg-[#f6871e]/5 rounded-2xl border border-[#f6871e]/10 text-xs">
-                <AlertCircle className="w-5 h-5 text-[#f6871e] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-4 bg-[#3f7abe]/5 rounded-2xl border border-[#3f7abe]/10 text-xs">
+                <AlertCircle className="w-5 h-5 text-[#3f7abe] shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-black text-[#f6871e] uppercase tracking-wide">File Columns requirement</p>
+                  <p className="font-black text-[#3f7abe] uppercase tracking-wide">Smart Excel Import</p>
                   <p className="text-slate-600 font-medium mt-1">
-                    Your file must contain the headers: <strong className="text-slate-800">Name</strong>, <strong className="text-slate-800">Phone</strong>, and <strong className="text-slate-800">Address</strong>. You can also include <strong className="text-slate-800">Remarks</strong>. Non-empty Name and Phone are required.
+                    You can upload <strong className="text-slate-800">any Excel file</strong>! The system will automatically detect name, phone, and address columns. All other columns in the file will be saved under <strong className="text-slate-800">Remarks</strong> so no data is lost.
                   </p>
                 </div>
               </div>

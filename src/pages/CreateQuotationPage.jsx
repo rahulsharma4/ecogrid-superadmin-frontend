@@ -37,6 +37,7 @@ const CreateQuotationPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useAuth();
+  const companyName = user?.companyDetails?.companyName || 'Solar Hub';
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -439,7 +440,7 @@ const CreateQuotationPage = () => {
               </div>
               <div className="space-y-2">
                 <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Solar Panels *</label>
-                <input type="text" required value={formData.solarPanels} onChange={e => setFormData({ ...formData, solarPanels: e.target.value })} placeholder="e.g. EG - Adani - 620 Wp" className="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[1.5rem] outline-none font-bold text-slate-900 focus:bg-white focus:border-[#f6871e] transition-all" />
+                 <input type="text" required value={formData.solarPanels} onChange={e => setFormData({ ...formData, solarPanels: e.target.value })} placeholder={`e.g. ${user?.companyDetails?.companyShortName || 'SH'} - Adani - 620 Wp`} className="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[1.5rem] outline-none font-bold text-slate-900 focus:bg-white focus:border-[#f6871e] transition-all" />
               </div>
               <div className="space-y-4 bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
                 <div className="space-y-2">
@@ -892,7 +893,7 @@ const CreateQuotationPage = () => {
                 <option value="Standard" />
               </datalist>
               <datalist id="installationBrands">
-                <option value="Eco Grid" />
+                <option value={companyName} />
                 <option value="Complete Installation & Setup" />
               </datalist>
             </div>
