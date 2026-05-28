@@ -240,27 +240,29 @@ const FormalInvoicePage = () => {
                    <p style={{ fontSize: '10px', fontWeight: '700', color: user?.companyDetails?.themeColor || '#3f7abe', fontStyle: 'italic', lineHeight: '1.4' }}>Rupees {numberToWords(netAmt)} Only</p>
                    
                    <div style={{ marginTop: '20px', display: 'flex', gap: '15px' }}>
-                      <div style={{ flex: '1', padding: '12px', backgroundColor: '#f0f9ff', borderRadius: '12px', border: '1px solid #bae6fd' }}>
-                         <p style={{ fontSize: '8px', fontWeight: '900', color: '#0369a1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bank Remittance</p>
-                         <p style={{ fontSize: '8px', fontWeight: '800', color: user?.companyDetails?.themeColor || '#3f7abe', lineHeight: '1.4' }}>
-                            {user?.companyDetails?.payeeName || 'SOLAR HUB PRIVATE LIMITED'}<br/>
-                            Bank: {user?.companyDetails?.bankName || 'Settlement Bank'}<br/>
-                            A/C: {user?.companyDetails?.bankAccountNo || '1234567890 (Current)'}<br/>
-                            IFSC: {user?.companyDetails?.bankIfsc || 'BANKIFSC000'}
-                         </p>
-                      </div>
+                      {user?.companyDetails?.bankAccountNo && (
+                        <div style={{ flex: '1', padding: '12px', backgroundColor: '#f0f9ff', borderRadius: '12px', border: '1px solid #bae6fd' }}>
+                           <p style={{ fontSize: '8px', fontWeight: '900', color: '#0369a1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bank Remittance</p>
+                           <p style={{ fontSize: '8px', fontWeight: '800', color: user?.companyDetails?.themeColor || '#3f7abe', lineHeight: '1.4' }}>
+                              {user?.companyDetails?.payeeName}<br/>
+                              Bank: {user?.companyDetails?.bankName}<br/>
+                              A/C: {user?.companyDetails?.bankAccountNo}<br/>
+                              IFSC: {user?.companyDetails?.bankIfsc}
+                           </p>
+                        </div>
+                      )}
                       
-                      <div style={{ width: '120px', padding: '10px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                         <p style={{ fontSize: '7px', fontWeight: '900', color: user?.companyDetails?.themeColor || '#3f7abe', textTransform: 'uppercase', marginBottom: '5px', textAlign: 'center', letterSpacing: '0.02em' }}>Scan & Pay (UPI)</p>
-                         <img 
-                            src={user?.companyDetails?.paymentQrCode || `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
-                               `upi://pay?pa=${user?.companyDetails?.upiId || 'solarhub@upi'}&pn=${encodeURIComponent(user?.companyDetails?.payeeName || 'SOLAR HUB PRIVATE LIMITED')}&am=${netAmt}&cu=INR&tn=${encodeURIComponent(`Invoice ${invoice.invoiceNo || ''}`)}`
-                            )}`} 
-                            alt="Invoice UPI QR" 
-                            style={{ width: '70px', height: '70px', objectFit: 'contain' }} 
-                         />
-                         <p style={{ fontSize: '6px', fontWeight: '700', color: '#64748b', marginTop: '4px', textAlign: 'center', width: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.companyDetails?.upiId || 'solarhub@upi'}</p>
-                      </div>
+                      {user?.companyDetails?.paymentQrCode && (
+                        <div style={{ width: '120px', padding: '10px', backgroundColor: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                           <p style={{ fontSize: '7px', fontWeight: '900', color: user?.companyDetails?.themeColor || '#3f7abe', textTransform: 'uppercase', marginBottom: '5px', textAlign: 'center', letterSpacing: '0.02em' }}>Scan & Pay (UPI)</p>
+                           <img 
+                              src={user.companyDetails.paymentQrCode} 
+                              alt="Invoice UPI QR" 
+                              style={{ width: '70px', height: '70px', objectFit: 'contain' }} 
+                           />
+                           <p style={{ fontSize: '6px', fontWeight: '700', color: '#64748b', marginTop: '4px', textAlign: 'center', width: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.companyDetails?.upiId}</p>
+                        </div>
+                      )}
                    </div>
                 </div>
                

@@ -11,7 +11,7 @@ import logoImg from '../assets/Logo.jpeg';
 import coverEngineerImg from '../assets/cover_engineer.png';
 import coverTabletImg from '../assets/cover_tablet.png';
 import structureImg from '../assets/structure_diagram.png';
-import solarRoof1 from '../assets/solar_roof_1.png';
+import solarRoof1 from '../assets/WhatsApp Image 2026-05-27 at 3.45.23 PM.jpeg';
 import solarRoof2 from '../assets/solar_roof_2.png';
 import solarRoof3 from '../assets/solar_roof_3.png';
 import solarRail from '../assets/solar_rail.png';
@@ -289,11 +289,11 @@ const QuotationViewPage = () => {
             <h2 style={{ fontSize: '24px', fontWeight: '900', color: primaryThemeColor, textAlign: 'center', margin: 0, letterSpacing: '0.5px' }}>
               "GO GREEN GO SOLAR"
             </h2>
-            <div style={{ flex: 1, borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+            <div style={{ flex: 1, borderRadius: '16px', overflow: 'hidden', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {imagesBase64.roof1 ? (
-                <img src={imagesBase64.roof1} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Solar Roof" />
+                <img src={imagesBase64.roof1} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }} alt="Solar Roof" />
               ) : (
-                imagesBase64.structure && <img src={imagesBase64.structure} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Structure" />
+                imagesBase64.structure && <img src={imagesBase64.structure} style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }} alt="Structure" />
               )}
             </div>
           </div>
@@ -999,97 +999,105 @@ const QuotationViewPage = () => {
             </div>
 
             {/* Right part: Scan to Chat QR card */}
-            <div style={{
-              flex: '0.85',
-              background: 'rgba(255,255,255,0.15)',
-              borderRadius: '20px',
-              padding: '16px 12px',
-              border: '1px solid rgba(255,255,255,0.25)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              textAlign: 'center'
-            }}>
-              <p style={{ fontSize: '9px', fontWeight: '900', color: '#ffffff', textTransform: 'uppercase', margin: 0, letterSpacing: '0.05em' }}>Scan to Chat</p>
-              <img 
-                src={user?.companyDetails?.whatsappQrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://wa.me/' + ((user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '916388908096').replace(/[^0-9]/g, '')))}`}
-                alt="WhatsApp QR Code" 
-                style={{ width: '90px', height: '90px', display: 'block', borderRadius: '8px', objectFit: 'contain', background: '#ffffff', padding: '4px' }} 
-              />
-              <p style={{ fontSize: '8px', fontWeight: '900', color: '#ffffff', margin: 0 }}>{user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '+91 6388908096'}</p>
-            </div>
+            {user?.companyDetails?.whatsappQrCode && (
+              <div style={{
+                flex: '0.85',
+                background: 'rgba(255,255,255,0.15)',
+                borderRadius: '20px',
+                padding: '16px 12px',
+                border: '1px solid rgba(255,255,255,0.25)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                textAlign: 'center'
+              }}>
+                <p style={{ fontSize: '9px', fontWeight: '900', color: '#ffffff', textTransform: 'uppercase', margin: 0, letterSpacing: '0.05em' }}>Scan to Chat</p>
+                <img 
+                  src={user.companyDetails.whatsappQrCode}
+                  alt="WhatsApp QR Code" 
+                  style={{ width: '90px', height: '90px', display: 'block', borderRadius: '8px', objectFit: 'contain', background: '#ffffff', padding: '4px' }} 
+                />
+                <p style={{ fontSize: '8px', fontWeight: '900', color: '#ffffff', margin: 0 }}>{user?.companyDetails?.whatsappNumber || user?.companyDetails?.supportPhone || '+91 6388908096'}</p>
+              </div>
+            )}
           </div>
 
           {/* Bank Remittance Container Card */}
-          <div style={{
-            background: '#ffffff',
-            borderRadius: '24px',
-            padding: '24px 20px',
-            border: '2px solid #f1f5f9',
-            boxShadow: '0 8px 25px rgba(0,0,0,0.02)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '15px',
-            position: 'relative',
-            zIndex: 10
-          }}>
-            {/* Left part: Bank Account Details */}
-            <div style={{ flex: '1.4', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <span style={{ fontSize: '12px', fontWeight: '900', color: primaryThemeColor, letterSpacing: '1px', textTransform: 'uppercase' }}>Bank Remittance</span>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div>
-                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Account Name</span>
-                  <p style={{ margin: 0, fontSize: '11px', fontWeight: '800', color: '#334155', textTransform: 'uppercase' }}>{user?.companyDetails?.payeeName || 'ECOGRID INFRA PRIVATE LIMITED'}</p>
-                </div>
-                <div>
-                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Bank Name</span>
-                  <p style={{ margin: 0, fontSize: '11px', fontWeight: '800', color: '#334155' }}>{user?.companyDetails?.bankName || 'Punjab National Bank'}</p>
-                </div>
-                <div>
-                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Account Number (Current)</span>
-                  <p style={{ margin: 0, fontSize: '12px', fontWeight: '900', color: primaryThemeColor }}>{user?.companyDetails?.bankAccountNo || '6193002100004183'}</p>
-                </div>
-                <div>
-                  <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>IFSC Code</span>
-                  <p style={{ margin: 0, fontSize: '12px', fontWeight: '900', color: '#334155' }}>{user?.companyDetails?.bankIfsc || 'PUNB0619300'}</p>
-                </div>
-              </div>
-              
-              <div>
-                <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Branch</span>
-                <p style={{ margin: 0, fontSize: '10px', fontWeight: '800', color: '#475569' }}>
-                  {user?.companyDetails?.bankBranch || 'Vibhuti Khand, Gomti Nagar, Lucknow'}
-                </p>
-              </div>
-            </div>
-
-            {/* Right part: Scan to Pay QR card */}
+          {user?.companyDetails?.bankAccountNo && (
             <div style={{
-              flex: '0.85',
               background: '#ffffff',
-              borderRadius: '20px',
-              padding: '16px 12px',
-              border: '1px solid #cbd5e1',
+              borderRadius: '24px',
+              padding: '24px 20px',
+              border: '2px solid #f1f5f9',
+              boxShadow: '0 8px 25px rgba(0,0,0,0.02)',
               display: 'flex',
-              flexDirection: 'column',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              textAlign: 'center'
+              gap: '15px',
+              position: 'relative',
+              zIndex: 10
             }}>
-              <p style={{ fontSize: '9px', fontWeight: '900', color: primaryThemeColor, textTransform: 'uppercase', margin: 0, letterSpacing: '0.05em' }}>Scan to Pay</p>
-              <img 
-                src={user?.companyDetails?.paymentQrCode || `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('upi://pay?pa=' + (user?.companyDetails?.upiId || '6193002100004183@pnb') + '&pn=' + (user?.companyDetails?.payeeName || 'ECOGRID INFRA PRIVATE LIMITED') + '&cu=INR')}`}
-                alt="Payment QR Code" 
-                style={{ width: '90px', height: '90px', display: 'block', borderRadius: '8px', objectFit: 'contain' }} 
-              />
-              <p style={{ fontSize: '8px', fontWeight: '900', color: '#64748b', margin: 0, wordBreak: 'break-all', maxWidth: '100px' }}>{user?.companyDetails?.upiId || '6193002100004183@pnb'}</p>
+              {/* Left part: Bank Account Details */}
+              <div style={{ flex: user?.companyDetails?.paymentQrCode ? '1.4' : '1', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <span style={{ fontSize: '12px', fontWeight: '900', color: primaryThemeColor, letterSpacing: '1px', textTransform: 'uppercase' }}>Bank Remittance</span>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div>
+                    <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Account Name</span>
+                    <p style={{ margin: 0, fontSize: '11px', fontWeight: '800', color: '#334155', textTransform: 'uppercase' }}>{user?.companyDetails?.payeeName}</p>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Bank Name</span>
+                    <p style={{ margin: 0, fontSize: '11px', fontWeight: '800', color: '#334155' }}>{user?.companyDetails?.bankName}</p>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Account Number (Current)</span>
+                    <p style={{ margin: 0, fontSize: '12px', fontWeight: '900', color: primaryThemeColor }}>{user?.companyDetails?.bankAccountNo}</p>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>IFSC Code</span>
+                    <p style={{ margin: 0, fontSize: '12px', fontWeight: '900', color: '#334155' }}>{user?.companyDetails?.bankIfsc}</p>
+                  </div>
+                </div>
+                
+                {user?.companyDetails?.bankBranch && (
+                  <div>
+                    <span style={{ fontSize: '9px', fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Branch</span>
+                    <p style={{ margin: 0, fontSize: '10px', fontWeight: '800', color: '#475569' }}>
+                      {user.companyDetails.bankBranch}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right part: Scan to Pay QR card */}
+              {user?.companyDetails?.paymentQrCode && (
+                <div style={{
+                  flex: '0.85',
+                  background: '#ffffff',
+                  borderRadius: '20px',
+                  padding: '16px 12px',
+                  border: '1px solid #cbd5e1',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  textAlign: 'center'
+                }}>
+                  <p style={{ fontSize: '9px', fontWeight: '900', color: primaryThemeColor, textTransform: 'uppercase', margin: 0, letterSpacing: '0.05em' }}>Scan to Pay</p>
+                  <img 
+                    src={user.companyDetails.paymentQrCode}
+                    alt="Payment QR Code" 
+                    style={{ width: '90px', height: '90px', display: 'block', borderRadius: '8px', objectFit: 'contain' }} 
+                  />
+                  <p style={{ fontSize: '8px', fontWeight: '900', color: '#64748b', margin: 0, wordBreak: 'break-all', maxWidth: '100px' }}>{user?.companyDetails?.upiId}</p>
+                </div>
+              )}
             </div>
-          </div>
+          )}
           
           {/* Footer Website Address */}
           <div style={{ textAlign: 'center', zIndex: 10, borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>

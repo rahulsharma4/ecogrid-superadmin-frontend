@@ -347,25 +347,21 @@ const PaymentReceiptPage = () => {
                     <span>₹{summary.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                  </div>
               </div>
-
-              {/* Bottom Row: Bank Details & Signatory Section */}
+                       {/* Bottom Row: Bank Details & Signatory Section */}
               <div style={{ marginTop: '50px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                 <div style={{ width: '320px', textAlign: 'left' }}>
-                    <div style={{ padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '12px', border: '1px solid #bae6fd' }}>
-                       <p style={{ fontSize: '8px', fontWeight: '900', color: '#0369a1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bank Remittance</p>
-                       <p style={{ fontSize: '9px', fontWeight: '800', color: primaryThemeColor, lineHeight: '1.4' }}>
-                          {user?.companyDetails?.payeeName || 'SOLAR HUB PRIVATE LIMITED'}<br/>
-                          Bank: {user?.companyDetails?.bankName || 'Settlement Bank'}<br/>
-                          A/C No: {user?.companyDetails?.bankAccountNo || '123456789012 (Current)'}<br/>
-                          IFSC Code: {user?.companyDetails?.bankIfsc || 'SBIN0001234'}
-                          {!(user?.companyDetails?.bankName) && (
-                             <>
-                               <br/>Branch: Main Corporate Branch
-                             </>
-                          )}
-                       </p>
+                 {user?.companyDetails?.bankAccountNo && (
+                    <div style={{ width: '320px', textAlign: 'left' }}>
+                       <div style={{ padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '12px', border: '1px solid #bae6fd' }}>
+                          <p style={{ fontSize: '8px', fontWeight: '900', color: '#0369a1', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bank Remittance</p>
+                          <p style={{ fontSize: '9px', fontWeight: '800', color: primaryThemeColor, lineHeight: '1.4' }}>
+                             {user?.companyDetails?.payeeName}<br/>
+                             Bank: {user?.companyDetails?.bankName}<br/>
+                             A/C No: {user?.companyDetails?.bankAccountNo}<br/>
+                             IFSC Code: {user?.companyDetails?.bankIfsc}
+                          </p>
+                       </div>
                     </div>
-                 </div>
+                 )}
                  
                  <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                     <p style={{ fontSize: '11px', fontWeight: '900', color: primaryThemeColor, marginBottom: '25px', textTransform: 'uppercase' }}>For {user?.companyDetails?.companyName || 'SOLAR HUB PRIVATE LIMITED'}</p>

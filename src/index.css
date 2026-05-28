@@ -156,6 +156,9 @@
 .group:hover .group-hover\:text-white {
   color: #ffffff !important;
 }
+.hover\:text-white:hover {
+  color: #ffffff !important;
+}
 /* opacity variants */
 .bg-\[\#3f7abe\]\/5 {
   background-color: color-mix(in srgb, var(--color-primary) 5%, transparent) !important;
