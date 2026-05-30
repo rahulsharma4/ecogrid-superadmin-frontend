@@ -34,7 +34,9 @@ const CompanySettingsPage = () => {
     whatsappQrCode: '',
     companyTagline: 'Powering the Solar Revolution.',
     companyDescription: 'Access the Command Center to manage your sustainable energy infrastructure.',
-    companySubHeader: 'Solar Command'
+    companySubHeader: 'Solar Command',
+    fbPageId: '',
+    fbPageName: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,7 +75,9 @@ const CompanySettingsPage = () => {
         whatsappQrCode: data.whatsappQrCode || '',
         companyTagline: data.companyTagline || 'Powering the Solar Revolution.',
         companyDescription: data.companyDescription || 'Access the Command Center to manage your sustainable energy infrastructure.',
-        companySubHeader: data.companySubHeader || 'Solar Command'
+        companySubHeader: data.companySubHeader || 'Solar Command',
+        fbPageId: data.fbPageId || '',
+        fbPageName: data.fbPageName || ''
       });
     } catch (err) {
       toast.error('Failed to load company settings');
@@ -81,6 +85,123 @@ const CompanySettingsPage = () => {
       setLoading(false);
     }
   };
+
+  const [fbPages, setFbPages] = useState([]);
+  const [showFbModal, setShowFbModal] = useState(false);
+  const [selectedFbPageId, setSelectedFbPageId] = useState('');
+  const [tempUserToken, setTempUserToken] = useState('');
+  const [isConnectingFb, setIsConnectingFb] = useState(false);
+
+  // Parse hash token on load
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+      const params = new URLSearchParams(hash.replace('#', '?'));
+      const token = params.get('access_token');
+      if (token) {
+        setTempUserToken(token);
+        fetchFbPages(token);
+      }
+      // Clean hash from URL
+      window.history.replaceState(null, null, window.location.pathname);
+    }
+  }, []);
+
+  const fetchFbPages = async (token) => {
+    const toastId = toast.loading('Fetching your Facebook Pages...');
+    try {
+      const response = await fetch(`https://graph.facebook.com/v19.0/me/accounts?access_token=${token}`);
+      const data = await response.json();
+      
+      if (data.error) {
+        toast.error(`Meta API Error: ${data.error.message}`, { id: toastId });
+        return;
+      }
+
+      if (!data.data || data.data.length === 0) {
+        toast.error('No managed Facebook Pages found on this account.', { id: toastId });
+        return;
+      }
+
+      setFbPages(data.data);
+      setSelectedFbPageId(data.data[0].id);
+      setShowFbModal(true);
+      toast.dismiss(toastId);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to query Facebook Pages.', { id: toastId });
+    }
+  };
+
+  const handleConnectFbPage = async () => {
+    if (!selectedFbPageId || !tempUserToken) return;
+    setIsConnectingFb(true);
+    const toastId = toast.loading('Linking Facebook page to your CRM...');
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/facebook/connect`, {
+        userAccessToken: tempUserToken,
+        selectedPageId: selectedFbPageId
+      }, config);
+
+      toast.success(data.message || 'Page linked successfully!', { id: toastId });
+      
+      setFormData(prev => ({
+        ...prev,
+        fbPageId: data.companyDetails.fbPageId,
+        fbPageName: data.companyDetails.fbPageName
+      }));
+
+      const storedUser = JSON.parse(localStorage.getItem('userInfo'));
+      if (storedUser) {
+        storedUser.companyDetails = data.companyDetails;
+        localStorage.setItem('userInfo', JSON.stringify(storedUser));
+      }
+      
+      setShowFbModal(false);
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message;
+      toast.error('Connection failed: ' + msg, { id: toastId });
+    } finally {
+      setIsConnectingFb(false);
+    }
+  };
+
+  const handleDisconnectFb = async () => {
+    if (!window.confirm('Are you sure you want to disconnect your Facebook Page? Leads will stop syncing.')) return;
+    const toastId = toast.loading('Disconnecting page...');
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${user.token}` } };
+      const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/facebook/disconnect`, {}, config);
+
+      toast.success(data.message, { id: toastId });
+
+      setFormData(prev => ({
+        ...prev,
+        fbPageId: '',
+        fbPageName: ''
+      }));
+
+      const storedUser = JSON.parse(localStorage.getItem('userInfo'));
+      if (storedUser) {
+        storedUser.companyDetails = data.companyDetails;
+        localStorage.setItem('userInfo', JSON.stringify(storedUser));
+      }
+    } catch (err) {
+      toast.error('Failed to disconnect Facebook page', { id: toastId });
+    }
+  };
+
+  const handleStartFbLogin = () => {
+    const clientId = import.meta.env.VITE_FB_APP_ID || '1599602048832259';
+    const redirectUri = encodeURIComponent(window.location.origin + '/dashboard/company-settings');
+    const scope = 'pages_read_engagement,pages_show_list,leads_retrieval';
+    const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=token`;
+    window.location.href = authUrl;
+  };
+
 
   useEffect(() => {
     fetchSettings();
@@ -410,6 +531,48 @@ const CompanySettingsPage = () => {
               </div>
             </div>
 
+            {/* Social Media Lead Ads Integration */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+              <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-50 pb-3">Social Media Integrations</h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide leading-relaxed">
+                Connect your Meta (Facebook & Instagram) Page to automatically import leads from your Lead Ads campaigns.
+              </p>
+              
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                {formData.fbPageId ? (
+                  <>
+                    <div className="space-y-1">
+                      <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded text-[9px] font-black uppercase tracking-wider">Connected</span>
+                      <h4 className="text-xs font-black text-slate-900 mt-1 uppercase tracking-wide">Connected Page: <span className="text-[#3f7abe]">{formData.fbPageName}</span></h4>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Page ID: {formData.fbPageId}</p>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={handleDisconnectFb}
+                      className="px-4 py-2.5 bg-red-50 hover:bg-red-600 text-red-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-red-100"
+                    >
+                      Disconnect Page
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-1">
+                      <span className="px-2 py-0.5 bg-slate-200 text-slate-600 rounded text-[9px] font-black uppercase tracking-wider">Not Integrated</span>
+                      <h4 className="text-xs font-black text-slate-800 mt-1 uppercase tracking-wide">Sync Meta Ads Campaigns</h4>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Integrate Facebook Forms in 1-Click</p>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={handleStartFbLogin}
+                      className="px-6 py-3 bg-[#1877f2] hover:bg-[#145dbf] text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md flex items-center gap-2"
+                    >
+                      Connect Facebook Page
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
           </div>
 
           {/* Panel 2: Visual customization (Logo, seal, color) */}
@@ -652,6 +815,52 @@ const CompanySettingsPage = () => {
         </div>
 
       </form>
+
+      {/* Facebook Page Selection Modal */}
+      {showFbModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full border border-slate-100 shadow-2xl p-6 space-y-6 animate-in zoom-in-95 duration-200">
+            <div>
+              <h3 className="text-base font-black text-slate-900 tracking-tight">Select Facebook Page</h3>
+              <p className="text-xs text-slate-500 mt-1 font-medium">Select the page you want to connect to receive Lead Ads data in near real-time.</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Available Facebook Pages</label>
+              <select
+                value={selectedFbPageId}
+                onChange={(e) => setSelectedFbPageId(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:bg-white focus:border-[#3f7abe] transition-all text-xs font-bold text-slate-950"
+              >
+                {fbPages.map(page => (
+                  <option key={page.id} value={page.id}>
+                    {page.name} (ID: {page.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setShowFbModal(false)}
+                className="px-5 py-3 border-2 border-slate-100 hover:bg-slate-50 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConnectFbPage}
+                disabled={isConnectingFb || !selectedFbPageId}
+                className="px-6 py-3 bg-[#3f7abe] hover:bg-[#33629c] text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md flex items-center gap-2"
+              >
+                {isConnectingFb && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                Link Page
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

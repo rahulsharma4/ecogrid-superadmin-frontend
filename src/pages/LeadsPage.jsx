@@ -61,6 +61,7 @@ const LeadsPage = () => {
   // Filter States
   const [filters, setFilters] = useState({
     status: 'All',
+    source: 'All',
     fromDate: '',
     toDate: ''
   });
@@ -314,6 +315,7 @@ const LeadsPage = () => {
   const filteredLeads = leads.filter(lead => {
     const matchesSearch = lead.name.toLowerCase().includes(searchTerm.toLowerCase()) || lead.phone.includes(searchTerm);
     const matchesStatus = filters.status === 'All' || lead.status === filters.status;
+    const matchesSource = filters.source === 'All' || (lead.source || 'Direct') === filters.source;
     
     // Date Filtering
     let matchesDate = true;
@@ -327,7 +329,7 @@ const LeadsPage = () => {
       }
     }
 
-    return matchesSearch && matchesStatus && matchesDate;
+    return matchesSearch && matchesStatus && matchesSource && matchesDate;
   });
 
   const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
@@ -335,7 +337,7 @@ const LeadsPage = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredLeads.slice(indexOfFirstItem, indexOfLastItem);
 
-  const activeFilterCount = (filters.status !== 'All' ? 1 : 0) + (filters.fromDate ? 1 : 0) + (filters.toDate ? 1 : 0);
+  const activeFilterCount = (filters.status !== 'All' ? 1 : 0) + (filters.source !== 'All' ? 1 : 0) + (filters.fromDate ? 1 : 0) + (filters.toDate ? 1 : 0);
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-64 gap-4">
@@ -395,7 +397,7 @@ const LeadsPage = () => {
                 <h3 className="font-bold text-slate-900">Refine Results</h3>
                 <button 
                   onClick={() => {
-                    setFilters({ status: 'All', fromDate: '', toDate: '' });
+                    setFilters({ status: 'All', source: 'All', fromDate: '', toDate: '' });
                     setShowFilterDropdown(false);
                   }}
                   className="text-[10px] font-black text-[#3f7abe] uppercase hover:underline flex items-center gap-1"
@@ -414,6 +416,19 @@ const LeadsPage = () => {
                   >
                     <option value="All">All Phases</option>
                     {Object.keys(statusColors).map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Lead Source</label>
+                  <select 
+                    value={filters.source}
+                    onChange={(e) => setFilters({...filters, source: e.target.value})}
+                    className="input-field bg-slate-50 border-none"
+                  >
+                    <option value="All">All Sources</option>
+                    <option value="Direct">Direct / Manual</option>
+                    <option value="Facebook Ads">Facebook Ads</option>
                   </select>
                 </div>
 
@@ -494,6 +509,14 @@ const LeadsPage = () => {
                         <option key={s} value={s} disabled={lead.status === 'Closed'}>{s}</option>
                       ))}
                     </select>
+
+                    <span className={`text-[8px] font-black px-2 py-0.5 rounded border uppercase tracking-wider shadow-sm ${
+                      lead.source === 'Facebook Ads' 
+                      ? 'bg-blue-50 text-[#1877f2] border-blue-200' 
+                      : 'bg-slate-100 text-slate-600 border-slate-200'
+                    }`}>
+                      {lead.source || 'Direct'}
+                    </span>
                     
                     {lead.followUpDate ? (
                       <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-tighter shadow-sm animate-pulse
