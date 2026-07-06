@@ -197,7 +197,7 @@ const CompanySettingsPage = () => {
   const handleStartFbLogin = () => {
     const clientId = import.meta.env.VITE_FB_APP_ID || '1599602048832259';
     const redirectUri = encodeURIComponent(window.location.origin + '/dashboard/company-settings');
-    const scope = 'pages_read_engagement,pages_show_list,leads_retrieval';
+    const scope = 'pages_read_engagement,pages_show_list,leads_retrieval,pages_manage_metadata';
     const authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&response_type=token`;
     window.location.href = authUrl;
   };
